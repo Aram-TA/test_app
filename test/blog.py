@@ -1,9 +1,15 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    url_for
 )
 from werkzeug.exceptions import abort
-from datetime import datetime
 from auth import login_required
+from datetime import datetime
 import data_constructor
 
 bp = Blueprint("blog", __name__)

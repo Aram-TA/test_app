@@ -1,17 +1,16 @@
+from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
-
+import data_constructor
 from flask import (
-    Blueprint,
-    flash,
-    redirect,
     render_template,
+    Blueprint,
+    redirect,
     request,
     session,
     url_for,
+    flash,
     g
 )
-from werkzeug.security import check_password_hash, generate_password_hash
-import data_constructor
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 user_data = data_constructor.load_user_data()

@@ -3,7 +3,7 @@ import blog
 import auth
 
 
-def create_app(test_config: dict = None):
+def app_constructor(test_config: dict = None):
     app = Flask(__name__)
     app.secret_key = "dev"
 
@@ -22,7 +22,3 @@ def create_app(test_config: dict = None):
         return "Hello, World!"
 
     app.run()
-
-
-if __name__ == "__main__":
-    create_app()
