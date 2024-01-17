@@ -130,6 +130,19 @@ def logout():
 
 
 def login_required(view):
+    """
+    Decorator that checks is user logged in or not,
+    if not redirects to login page
+
+    Parameters
+    -----------
+    function
+
+    Returns
+    -------
+    function
+
+    """
     @wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
