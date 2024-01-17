@@ -1,3 +1,4 @@
+from typing import Any
 import json
 import os
 
@@ -7,6 +8,18 @@ current_id_path = "test/data/current_id.txt"
 
 
 def init_data():
+    """
+    Creates all necessary dirs if they does't exist
+
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
     if not os.path.exists("data"):
         os.mkdir("data")
     if not os.path.exists(users_path):
@@ -21,19 +34,52 @@ def init_data():
 init_data()
 
 
-def write_data(path: str, data):
+def write_data(path: str, data: Any):
+    """
+    Writes received data to target path
+
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
     with open(path, "w") as json_file:
         json.dump(data, json_file, indent=1)
 
 
 def load_user_data():
-    with open(users_path, "r") as users_file:
-        users = json.load(users_file)
+    """
+    Loads data from json file
 
-    return users
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
+    with open(users_path, "r") as users_file:
+        return json.load(users_file)
 
 
 def get_post_id():
+    """
+    Gets next post id from file
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
     with open(current_id_path, "r") as current_id_file:
         current_id = current_id_file.read()
 
@@ -44,7 +90,17 @@ def get_post_id():
 
 
 def load_posts_data():
-    with open(posts_path, "r") as posts_file:
-        posts = json.load(posts_file)
+    """
+    Loads post data from json file
 
-    return posts
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
+    with open(posts_path, "r") as posts_file:
+        return json.load(posts_file)

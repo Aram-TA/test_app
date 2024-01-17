@@ -18,6 +18,18 @@ user_data = data_constructor.load_user_data()
 
 @bp.route("/register", methods=("GET", "POST"))
 def register():
+    """
+    Does some validation for registration then if it succeed redirects to login
+
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -41,6 +53,18 @@ def register():
 
 @bp.route("/login", methods=("GET", "POST"))
 def login():
+    """
+    Does some validation for login then if it succeed redirects to index page
+
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -67,6 +91,18 @@ def login():
 
 @bp.before_app_request
 def load_logged_in_user():
+    """
+    Defines if current user is logged in or not by using flask's g object
+
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
     current_user = session.get("current_user")
 
     if current_user is None:
@@ -77,6 +113,18 @@ def load_logged_in_user():
 
 @bp.route("/logout")
 def logout():
+    """
+    Clears all data of current flask session and redirects to index page
+
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
     session.clear()
     return redirect(url_for("index"))
 

@@ -4,6 +4,18 @@ import auth
 
 
 def app_constructor(test_config: dict = None):
+    """
+    Creates flasks application object, configures it then runs it
+
+    Parameters
+    -----------
+    test_config: dict
+
+    Returns
+    -------
+    None
+
+    """
     app = Flask(__name__)
     app.secret_key = "dev"
 
@@ -19,6 +31,18 @@ def app_constructor(test_config: dict = None):
 
     @app.route("/hello")
     def say_hello():
+        """
+        Responses to "/hello" url says hello world
+
+        Parameters
+        -----------
+        None
+
+        Returns
+        -------
+        None
+
+        """
         return "Hello, World!"
 
     app.run()
