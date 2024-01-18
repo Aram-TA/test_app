@@ -1,6 +1,5 @@
-from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
-import data_constructor
+
 from flask import (
     render_template,
     Blueprint,
@@ -12,8 +11,14 @@ from flask import (
     g
 )
 
+from werkzeug.security import generate_password_hash
+
+from data_constructor import DataConstructor
+import validator
+
 bp = Blueprint("auth", __name__, url_prefix="/auth")
-user_data = data_constructor.load_user_data()
+data_handler = DataConstructor()
+user_data = data_handler.load_user_data()
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -31,24 +36,46 @@ def register():
 
     """
     if request.method == "POST":
+        print("This works")
+        email = request.form["email"]
+        phone_number = request.form["phone_number"]
         username = request.form["username"]
         password = request.form["password"]
+        repeated_password = request.form["password_repeat"]
         error = None
 
-        if not username:
-            error = "Username is required"
-        elif not password:
-            error = "Password is required"
-        elif username in user_data:
-            error = "Username already exists"
+        error = validator.validate_email(email, user_data)
+        if error is not None:
+            flash(error)
+            return render_template("auth/register.html")
+        print("email validated")
 
-        if error is None:
-            user_data[username] = generate_password_hash(password)
-            data_constructor.write_data(data_constructor.users_path, user_data)
-            return redirect(url_for("auth.login"))
+        error = validator.validate_phone_number(phone_number)
+        if error is not None:
+            flash(error)
+            return render_template("auth/register.html")
+        print("Phone number validated")
 
-        flash(error)
-    return render_template("auth/register.html")
+        if password != repeated_password:
+            flash("Passwords in both fields should be same.")
+            return render_template("auth/register.html")
+        print("Passwords are same.")
+
+        error = validator.validate_password(email, password, user_data)
+        if error is not None:
+            flash(error)
+            return render_template("auth/register.html")
+        print("Password is not empty it passed")
+
+        user_data[email] = {
+            "phone_number": phone_number,
+            "username": username,
+            "password": generate_password_hash(password),
+        }
+        data_handler.write_data(data_handler.users_path, user_data)
+        return redirect(url_for("auth.login"))
+    else:
+        return render_template("auth/register.html")
 
 
 @bp.route("/login", methods=("GET", "POST"))
@@ -66,27 +93,27 @@ def login():
 
     """
     if request.method == "POST":
-        username = request.form["username"]
+        print("We are in login post")
+        email = request.form["email"]
         password = request.form["password"]
-        error = None
 
-        if not username:
-            error = "Username is required"
-        elif not password:
-            error = "Password is required"
-        elif username not in user_data:
-            error = "Username doesn't exist"
-        elif not check_password_hash(user_data[username], password):
-            error = "Incorrect password"
+        error = validator.validate_email(email, user_data, True)
+        if error is not None:
+            flash(error)
+            return render_template("auth/login.html")
+        print("Email validated")
 
-        if error is None:
-            session.clear()
-            session["current_user"] = username
-            return redirect(url_for("index"))
+        error = validator.validate_password(email, password, user_data, True)
+        if error is not None:
+            flash(error)
+            return render_template("auth/login.html")
+        print("Password validated.")
 
-        flash(error)
-
-    return render_template("auth/login.html")
+        session.clear()
+        session["current_user"] = email
+        return redirect(url_for("index"))
+    else:
+        return render_template("auth/login.html")
 
 
 @bp.before_app_request
@@ -109,6 +136,7 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = current_user
+        g.username = user_data[current_user]["username"]
 
 
 @bp.route("/logout")

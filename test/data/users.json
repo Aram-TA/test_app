@@ -1,4 +1,7 @@
 {
- "Aram": "pbkdf2:sha256:260000$d1kBYmvKvWsuBruR$97bfad7f8f350d4a81f5ce3b36d9815020daeaba86a927107ab29fa9f6e606ff",
- "Narek": "pbkdf2:sha256:260000$tGglTPmz57QaImBQ$1612311688efa685d5b4932177283e861256855fcab26120fb76585452b60645"
+ "aramg267@gmail.com": {
+  "phone_number": "4565446",
+  "username": "Aram",
+  "password": "pbkdf2:sha256:260000$2jBW6TNWksDgpkWB$7c9a4e2dfc987c315c527342262aca445bfef6a556ce5832df4a79886d76357e"
+ }
 }

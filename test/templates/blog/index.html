@@ -15,7 +15,7 @@
           <h1>{{ posts[id]['title'] }}</h1>
           <div class="about">by {{ posts[id]['author'] }} on {{ posts[id]['created'] }}</div>
         </div>
-        {% if g.user == posts[id]['author'] %}
+        {% if g.user == posts[id]['author_email'] %}
           <a class="action" href="{{ url_for('blog.update_post', id=id) }}">
             Edit
           </a>
