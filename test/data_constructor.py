@@ -1,17 +1,15 @@
-from typing import Any
+from datetime import datetime
 import json
 import os
 
 
 class DataConstructor:
-    def __init__(self) -> None:
-        self.users_path = "data/users.json"
-        self.posts_path = "data/posts.json"
-        self.current_post_id_path = "data/current_post_id.txt"
-        self.current_user_id_path = "data/current_user_id.txt"
-        self.init_data()
+    users_path = "data/users.json"
+    posts_path = "data/posts.json"
+    current_post_id_path = "data/current_post_id.txt"
 
-    def init_data(self):
+    @classmethod
+    def init_data(cls):
         """
         Creates all necessary dirs if they does't exist
 
@@ -27,17 +25,47 @@ class DataConstructor:
         if not os.path.exists("data"):
             os.mkdir("data")
 
-        if not os.path.exists(self.users_path):
-            self.write_data(self.users_path, {})
+        if not os.path.exists(cls.users_path):
+            cls.write_data(cls.users_path, {})
 
-        if not os.path.exists(self.posts_path):
-            self.write_data(self.posts_path, {})
+        if not os.path.exists(cls.posts_path):
+            cls.write_data(cls.posts_path, {})
 
-        if not os.path.exists(self.current_post_id_path):
-            with open(self.current_post_id_path, "w") as current_post_id_file:
+        if not os.path.exists(cls.current_post_id_path):
+            with open(cls.current_post_id_path, "w") as current_post_id_file:
                 current_post_id_file.write("1")
 
-    def write_data(self, path: str, data: Any):
+    @classmethod
+    def insert_post(cls, id: int, title: str, body: str, author_email: str):
+        """
+        Inserts or changes new key-value pair to posts_data global variable
+
+        Parameters
+        -----------
+        id: int
+        title: str
+        body: str
+        author_email: str
+
+        Returns
+        -------
+        None
+
+        """
+        data = cls.load_posts_data()
+        data[id] = {
+            # Without this id I can't get id from decorator for delete function
+            "id": id,
+            "title": title,
+            "body": body,
+            "author": cls.load_user_data()[author_email]["username"],
+            "author_email": author_email,
+            "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        cls.write_data(cls.posts_path, data)
+
+    @staticmethod
+    def write_data(path: str, data: dict):
         """
         Writes received data to target path
 
@@ -53,7 +81,8 @@ class DataConstructor:
         with open(path, "w") as json_file:
             json.dump(data, json_file, indent=1)
 
-    def load_user_data(self):
+    @classmethod
+    def load_user_data(cls) -> dict:
         """
         Loads data from json file
 
@@ -63,13 +92,14 @@ class DataConstructor:
 
         Returns
         -------
-        None
+        dict
 
         """
-        with open(self.users_path, "r") as users_file:
+        with open(cls.users_path, "r") as users_file:
             return json.load(users_file)
 
-    def get_post_id(self):
+    @classmethod
+    def get_post_id(cls) -> str:
         """
         Gets next post id from file
         Parameters
@@ -78,18 +108,17 @@ class DataConstructor:
 
         Returns
         -------
-        None
+        str
 
         """
-        with open(self.current_post_id_path, "r") as current_post_id_file:
+        with open(cls.current_post_id_path, "r+") as current_post_id_file:
             current_post_id = current_post_id_file.read()
-
-        with open(self.current_post_id_path, "w") as current_post_id_file:
             current_post_id_file.write(str(int(current_post_id) + 1))
 
         return current_post_id
 
-    def load_posts_data(self):
+    @classmethod
+    def load_posts_data(cls):
         """
         Loads post data from json file
 
@@ -99,8 +128,11 @@ class DataConstructor:
 
         Returns
         -------
-        None
+        dict
 
         """
-        with open(self.posts_path, "r") as posts_file:
+        with open(cls.posts_path, "r") as posts_file:
             return json.load(posts_file)
+
+
+DataConstructor.init_data()

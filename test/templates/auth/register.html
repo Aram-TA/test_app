@@ -2,6 +2,9 @@
 
 {% block header %}
 <h1>{% block title %}Register{% endblock %}</h1>
+{% if error %}
+<p>{{ error }}</p>
+{% endif %}
 {% endblock %}
 
 {% block content %}

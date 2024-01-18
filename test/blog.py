@@ -1,52 +1,17 @@
-from datetime import datetime
-
 from flask import (
-    Blueprint,
-    flash,
-    g,
-    redirect,
-    render_template,
+    url_for,
     request,
-    url_for
+    session,
+    redirect,
+    Blueprint,
+    render_template
 )
 
-from werkzeug.exceptions import abort
 
 from auth import login_required
 from data_constructor import DataConstructor
 
-data_handler = DataConstructor()
 bp = Blueprint("blog", __name__)
-
-user_data = data_handler.load_user_data()
-posts_data = data_handler.load_posts_data()
-
-
-def insert_post(id: int, title: str, body: str, author_email: str):
-    """
-    Inserts or changes new key-value pair to posts_data global variable
-
-    Parameters
-    -----------
-    id: int
-    title: str
-    body: str
-    author_email: str
-
-    Returns
-    -------
-    None
-
-    """
-    posts_data[id] = {
-        # Without this id I can't get id from decorator for delete function
-        "id": id,
-        "title": title,
-        "body": body,
-        "author": user_data[author_email]["username"],
-        "author_email": author_email,
-        "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
 
 
 @bp.route("/")
@@ -63,8 +28,11 @@ def index():
     None
 
     """
-    print("You are in index.")
-    return render_template("blog/index.html", posts=posts_data)
+    return render_template(
+        "blog/index.html",
+        posts=DataConstructor.load_posts_data(),
+        session=session
+    )
 
 
 @bp.route("/create", methods=("GET", "POST"))
@@ -83,20 +51,26 @@ def create():
     None
 
     """
-    if request.method == "POST":
-        title = request.form["title"]
-        body = request.form["body"]
+    if request.method != "POST":
+        return render_template("blog/create.html")
 
-        if not title:
-            flash("Title is required")
-        else:
-            insert_post(data_handler.get_post_id(), title, body, g.user)
-            data_handler.write_data(
-                data_handler.posts_path, posts_data
-            )
-            return redirect(url_for("blog.index"))
+    title = request.form["title"]
+    body = request.form["body"]
 
-    return render_template("blog/create.html")
+    if not title:
+        return render_template("blog/create.html", error="Title is required")
+
+    DataConstructor.insert_post(
+        DataConstructor.get_post_id(),
+        title,
+        body,
+        session["current_user"]
+    )
+    DataConstructor.write_data(
+        DataConstructor.posts_path,
+        DataConstructor.load_posts_data()
+    )
+    return redirect(url_for("index"))
 
 
 @bp.route("/<id>/update", methods=("GET", "POST"))
@@ -115,23 +89,28 @@ def update_post(id):
     None
 
     """
-    if request.method == "POST":
-        title = request.form["title"]
-        body = request.form["body"]
+    if request.method != "POST":
+        return render_template(
+            "blog/update.html",
+            post=DataConstructor.load_posts_data()[id]
+        )
 
-        if not title:
-            flash("Title is required.")
-        else:
-            if not posts_data.get(id, None):
-                abort(404, f"Post id {id} doesn't exist.")
-            else:
-                insert_post(id, title, body, g.user)
-                data_handler.write_data(
-                    data_handler.posts_path, posts_data
-                )
-                return redirect(url_for("index"))
+    title = request.form["title"]
+    body = request.form["body"]
 
-    return render_template("blog/update.html", post=posts_data[id])
+    if not title:
+        return render_template(
+            "blog/update.html",
+            post=DataConstructor.load_posts_data()[id],
+            error="Title is required."
+        )
+
+    DataConstructor.insert_post(id, title, body, session["current_user"])
+    DataConstructor.write_data(
+        DataConstructor.posts_path,
+        DataConstructor.load_posts_data()
+    )
+    return redirect(url_for("index"))
 
 
 @bp.route('/<id>/delete', methods=('POST', "GET"))
@@ -151,8 +130,16 @@ def delete(id):
 
     """
     try:
-        del posts_data[id]
-        data_handler.write_data(data_handler.posts_path, posts_data)
+        data = DataConstructor.load_posts_data()
+        del data[id]
+        DataConstructor.write_data(
+            DataConstructor.posts_path,
+            data
+            )
     except KeyError:
-        abort(404, f"Post id {id} doesn't exist.")
-    return redirect(url_for('blog.index'))
+        return render_template(
+            "blog/update.html",
+            post=DataConstructor.load_posts_data()[id],
+            error=f"Post id {id} doesn't exist."
+        )
+    return redirect(url_for('index'))

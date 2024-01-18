@@ -1,10 +1,14 @@
 import re
+
 from werkzeug.security import check_password_hash
+
+from data_constructor import DataConstructor
 
 
 def validate_phone_number(phone_number: str):
     if re.match(r'^[\d+\- ]{6,20}$', phone_number) is None:
-        return "Invalid phone number. Please use right format for phone number."
+        return """\t\t\tInvalid phone number.
+                  Please use right format for phone number."""
 
 
 def validate_password(
@@ -30,3 +34,47 @@ def validate_email(email: str, user_data: dict, login_mode: bool = False):
     if login_mode:
         if email not in user_data:
             return "User with that email not found."
+
+
+def validate_login(email, password):
+    error = validate_email(
+        email,
+        DataConstructor.load_user_data(),
+        True
+    )
+    if error:
+        return error
+    print("Email validated")
+
+    error = validate_password(
+        email,
+        password,
+        DataConstructor.load_user_data(),
+        True
+    )
+    if error:
+        return error
+
+
+def validate_registration(email, phone_number, password, repeated_password):
+    error = validate_email(
+        email,
+        DataConstructor.load_user_data()
+    )
+    if error:
+        return error
+
+    error = validate_phone_number(phone_number)
+    if error:
+        return error
+
+    if password != repeated_password:
+        return "Passwords in both fields should be same."
+
+    error = validate_password(
+        email,
+        password,
+        DataConstructor.load_user_data()
+    )
+    if error:
+        return error

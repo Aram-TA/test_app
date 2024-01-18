@@ -7,18 +7,31 @@ from flask import (
     request,
     session,
     url_for,
-    flash,
-    g
 )
 
 from werkzeug.security import generate_password_hash
 
 from data_constructor import DataConstructor
-import validator
+
+from validator import (
+    validate_registration,
+    validate_login
+)
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
-data_handler = DataConstructor()
-user_data = data_handler.load_user_data()
+
+
+def save_registered_account(email, phone_number, username, password):
+    data = DataConstructor.load_user_data()
+    data[email] = {
+        "phone_number": phone_number,
+        "username": username,
+        "password": generate_password_hash(password),
+    }
+    DataConstructor.write_data(
+        DataConstructor.users_path,
+        data
+    )
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -35,47 +48,25 @@ def register():
     None
 
     """
-    if request.method == "POST":
-        print("This works")
-        email = request.form["email"]
-        phone_number = request.form["phone_number"]
-        username = request.form["username"]
-        password = request.form["password"]
-        repeated_password = request.form["password_repeat"]
-        error = None
-
-        error = validator.validate_email(email, user_data)
-        if error is not None:
-            flash(error)
-            return render_template("auth/register.html")
-        print("email validated")
-
-        error = validator.validate_phone_number(phone_number)
-        if error is not None:
-            flash(error)
-            return render_template("auth/register.html")
-        print("Phone number validated")
-
-        if password != repeated_password:
-            flash("Passwords in both fields should be same.")
-            return render_template("auth/register.html")
-        print("Passwords are same.")
-
-        error = validator.validate_password(email, password, user_data)
-        if error is not None:
-            flash(error)
-            return render_template("auth/register.html")
-        print("Password is not empty it passed")
-
-        user_data[email] = {
-            "phone_number": phone_number,
-            "username": username,
-            "password": generate_password_hash(password),
-        }
-        data_handler.write_data(data_handler.users_path, user_data)
-        return redirect(url_for("auth.login"))
-    else:
+    if request.method != "POST":
         return render_template("auth/register.html")
+    email = request.form["email"]
+    phone_number = request.form["phone_number"]
+    username = request.form["username"]
+    password = request.form["password"]
+    repeated_password = request.form["password_repeat"]
+
+    error = validate_registration(
+        email,
+        phone_number,
+        password,
+        repeated_password
+    )
+    if error:
+        return render_template("auth/register.html", error=error)
+
+    save_registered_account(email, phone_number, username, password)
+    return redirect(url_for("auth.login"))
 
 
 @bp.route("/login", methods=("GET", "POST"))
@@ -92,51 +83,20 @@ def login():
     None
 
     """
-    if request.method == "POST":
-        print("We are in login post")
-        email = request.form["email"]
-        password = request.form["password"]
-
-        error = validator.validate_email(email, user_data, True)
-        if error is not None:
-            flash(error)
-            return render_template("auth/login.html")
-        print("Email validated")
-
-        error = validator.validate_password(email, password, user_data, True)
-        if error is not None:
-            flash(error)
-            return render_template("auth/login.html")
-        print("Password validated.")
-
-        session.clear()
-        session["current_user"] = email
-        return redirect(url_for("index"))
-    else:
+    if request.method != "POST":
         return render_template("auth/login.html")
 
+    email = request.form["email"]
+    password = request.form["password"]
 
-@bp.before_app_request
-def load_logged_in_user():
-    """
-    Defines if current user is logged in or not by using flask's g object
+    error = validate_login(email, password)
+    if error:
+        return render_template("auth/login.html", error=error)
 
-    Parameters
-    -----------
-    None
-
-    Returns
-    -------
-    None
-
-    """
-    current_user = session.get("current_user")
-
-    if current_user is None:
-        g.user = None
-    else:
-        g.user = current_user
-        g.username = user_data[current_user]["username"]
+    session.clear()
+    session["current_user"] = email
+    session["username"] = DataConstructor.load_user_data()[email]["username"]
+    return redirect(url_for("index"))
 
 
 @bp.route("/logout")
@@ -173,7 +133,7 @@ def login_required(view):
     """
     @wraps(view)
     def wrapped_view(**kwargs):
-        if g.user is None:
+        if session.get("current_user") is None:
             return redirect(url_for("auth.login"))
         return view(**kwargs)
     return wrapped_view
