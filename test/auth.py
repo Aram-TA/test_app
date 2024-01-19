@@ -1,6 +1,8 @@
+import json
 from functools import wraps
-from typing import Callable, Any, NewType, function
+from typing import Callable,  function
 
+from werkzeug.security import generate_password_hash
 from flask import (
     render_template,
     Blueprint,
@@ -8,8 +10,8 @@ from flask import (
     request,
     session,
     url_for,
+    Response
 )
-from werkzeug.security import generate_password_hash
 
 from data_constructor import DataConstructor
 from validator import (
@@ -18,14 +20,14 @@ from validator import (
 )
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
-Response = NewType("Response", Any)
 
 
 def save_registered_account(
     email: str,
     phone_number: str,
     username: str,
-    password: str
+    password: str,
+    repeated_password: str
 ) -> None:
     """
     Loads data from database and after inserts new values there
@@ -39,17 +41,18 @@ def save_registered_account(
     None
 
     """
-    data = DataConstructor.load_user_data()
+    with open(DataConstructor.users_path, "r+") as users_json:
+        data = json.load(users_json)
+        data[email] = {
+            "phone_number": phone_number,
+            "username": username,
+            "password": generate_password_hash(password),
+        }
 
-    data[email] = {
-        "phone_number": phone_number,
-        "username": username,
-        "password": generate_password_hash(password),
-    }
-    DataConstructor.write_data(
-        DataConstructor.users_path,
-        data
-    )
+        users_json.seek(0)
+        users_json.truncate()
+
+        json.dump(DataConstructor.users_path, data)
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -63,27 +66,20 @@ def register() -> Response:
 
     Returns
     -------
-    None
+    Response
 
     """
     if request.method != "POST":
         return render_template("auth/register.html")
-    email = request.form["email"]
-    phone_number = request.form["phone_number"]
-    username = request.form["username"]
-    password = request.form["password"]
-    repeated_password = request.form["password_repeat"]
 
     error = validate_registration(
-        email,
-        phone_number,
-        password,
-        repeated_password
+        request.form
     )
     if error:
         return render_template("auth/register.html", error=error)
 
-    save_registered_account(email, phone_number, username, password)
+    save_registered_account(request.form)
+
     return redirect(url_for("auth.login"))
 
 
@@ -99,7 +95,7 @@ def login() -> Response:
 
     Returns
     -------
-    None
+    Response
 
     """
     if request.method != "POST":
@@ -112,9 +108,11 @@ def login() -> Response:
     if error:
         return render_template("auth/login.html", error=error)
 
-    session.clear()
-    session["current_user"] = email
-    session["username"] = DataConstructor.load_user_data()[email]["username"]
+    with open(DataConstructor.users_path, "r") as users:
+        session.clear()
+        session["current_user"] = email
+        session["username"] = users[email]["username"]
+
     return redirect(url_for("index"))
 
 
@@ -129,7 +127,7 @@ def logout() -> Response:
 
     Returns
     -------
-    None
+    Response
 
     """
     session.clear()

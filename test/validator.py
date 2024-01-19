@@ -98,22 +98,23 @@ def validate_login(email: str, password: str) -> None | str:
     str | None
 
     """
-    error = validate_email(
-        email,
-        DataConstructor.load_user_data(),
-        True
-    )
-    if error:
-        return error
+    with open(DataConstructor.users_path, "r") as users_data:
+        error = validate_email(
+            email,
+            users_data,
+            True
+        )
+        if error:
+            return error
 
-    error = validate_password(
-        email,
-        password,
-        DataConstructor.load_user_data(),
-        True
-    )
-    if error:
-        return error
+        error = validate_password(
+            email,
+            password,
+            users_data,
+            True
+        )
+        if error:
+            return error
 
 
 def validate_registration(
@@ -135,24 +136,25 @@ def validate_registration(
     str | None
 
     """
-    error = validate_email(
-        email,
-        DataConstructor.load_user_data()
-    )
-    if error:
-        return error
+    with open(DataConstructor.users_path, "r") as users_data:
+        error = validate_email(
+            email,
+            users_data
+        )
+        if error:
+            return error
 
-    error = validate_phone_number(phone_number)
-    if error:
-        return error
+        error = validate_phone_number(phone_number)
+        if error:
+            return error
 
-    if password != repeated_password:
-        return "Passwords in both fields should be same."
+        if password != repeated_password:
+            return "Passwords in both fields should be same."
 
-    error = validate_password(
-        email,
-        password,
-        DataConstructor.load_user_data()
-    )
-    if error:
-        return error
+        error = validate_password(
+            email,
+            password,
+            users_data
+        )
+        if error:
+            return error
