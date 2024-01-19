@@ -113,6 +113,7 @@ class DataConstructor:
         """
         with open(cls.current_post_id_path, "r+") as current_post_id_file:
             current_post_id = current_post_id_file.read()
+            current_post_id_file.seek(0)
             current_post_id_file.write(str(int(current_post_id) + 1))
 
         return current_post_id

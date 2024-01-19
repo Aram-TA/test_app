@@ -29,7 +29,7 @@ def app_constructor(test_config: dict = None):
     app.register_blueprint(blog.bp)
     app.add_url_rule("/", endpoint="index")
 
-    app.run(debug=True)
+    app.run()
 
 
 if __name__ == "__main__":
