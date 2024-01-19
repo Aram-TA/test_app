@@ -1,4 +1,5 @@
 import re
+import json
 
 from werkzeug.security import check_password_hash
 
@@ -80,6 +81,8 @@ def validate_email(
         return "Invalid email format. Please use correct email format."
 
     if login_mode:
+        print(email)
+        print(user_data)
         if email not in user_data:
             return "User with that email not found."
 
@@ -99,9 +102,10 @@ def validate_login(email: str, password: str) -> None | str:
 
     """
     with open(DataConstructor.users_path, "r") as users_data:
+        data = json.load(users_data)
         error = validate_email(
             email,
-            users_data,
+            data,
             True
         )
         if error:
@@ -110,7 +114,7 @@ def validate_login(email: str, password: str) -> None | str:
         error = validate_password(
             email,
             password,
-            users_data,
+            data,
             True
         )
         if error:
@@ -120,8 +124,9 @@ def validate_login(email: str, password: str) -> None | str:
 def validate_registration(
     email: str,
     phone_number: str,
+    username: str,
     password: str,
-    repeated_password: str
+    password_repeat: str
 ) -> None | str:
     """
     Validates registration by using some functions above
@@ -129,7 +134,10 @@ def validate_registration(
     Parameters
     -----------
     email: str
+    phone_number: str
+    username: str
     password: str
+    password_repeat: str
 
     Returns
     -------
@@ -148,7 +156,7 @@ def validate_registration(
         if error:
             return error
 
-        if password != repeated_password:
+        if password != password_repeat:
             return "Passwords in both fields should be same."
 
         error = validate_password(

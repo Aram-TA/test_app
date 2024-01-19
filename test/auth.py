@@ -1,6 +1,6 @@
 import json
 from functools import wraps
-from typing import Callable,  function
+from typing import Callable, Any, NewType
 
 from werkzeug.security import generate_password_hash
 from flask import (
@@ -13,13 +13,14 @@ from flask import (
     Response
 )
 
-from data_constructor import DataConstructor
 from validator import (
     validate_registration,
     validate_login
 )
+from data_constructor import DataConstructor
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
+function = NewType("function", Any)
 
 
 def save_registered_account(
@@ -27,7 +28,7 @@ def save_registered_account(
     phone_number: str,
     username: str,
     password: str,
-    repeated_password: str
+    password_repeat: str
 ) -> None:
     """
     Loads data from database and after inserts new values there
@@ -52,7 +53,7 @@ def save_registered_account(
         users_json.seek(0)
         users_json.truncate()
 
-        json.dump(DataConstructor.users_path, data)
+        json.dump(data, users_json, indent=2)
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -71,14 +72,14 @@ def register() -> Response:
     """
     if request.method != "POST":
         return render_template("auth/register.html")
-
+    print(request.form)
     error = validate_registration(
-        request.form
+        **request.form
     )
     if error:
         return render_template("auth/register.html", error=error)
 
-    save_registered_account(request.form)
+    save_registered_account(**request.form)
 
     return redirect(url_for("auth.login"))
 
@@ -102,13 +103,13 @@ def login() -> Response:
         return render_template("auth/login.html")
 
     email = request.form["email"]
-    password = request.form["password"]
 
-    error = validate_login(email, password)
+    error = validate_login(email, request.form["password"])
     if error:
         return render_template("auth/login.html", error=error)
 
-    with open(DataConstructor.users_path, "r") as users:
+    with open(DataConstructor.users_path, "r") as users_file:
+        users = json.load(users_file)
         session.clear()
         session["current_user"] = email
         session["username"] = users[email]["username"]

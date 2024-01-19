@@ -1,4 +1,5 @@
 import os
+import json
 from typing import ClassVar
 
 
@@ -25,14 +26,13 @@ class DataConstructor:
             os.mkdir("data")
 
         if not os.path.exists(cls.users_path):
-            cls.write_data(cls.users_path, {})
+            with open(cls.users_path, "w") as users_file:
+                json.dump({}, users_file, indent=2)
 
         if not os.path.exists(cls.posts_path):
-            cls.write_data(cls.posts_path, {})
+            with open(cls.posts_path, "w") as posts_file:
+                json.dump({}, posts_file, indent=2)
 
         if not os.path.exists(cls.current_post_id_path):
             with open(cls.current_post_id_path, "w") as current_post_id_file:
                 current_post_id_file.write("1")
-
-
-DataConstructor.init_data()

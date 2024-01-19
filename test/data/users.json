@@ -1,12 +1,7 @@
 {
- "lol@kek.com": {
-  "phone_number": "1234567",
-  "username": "qwer",
-  "password": "pbkdf2:sha256:260000$Zj9MPAtolpapJmDV$635e4a8c70608893ccecfcfe841ea019b05bedc8d7ad2b5bcd995a88d5ff73a5"
- },
- "hello@gmail.com": {
-  "phone_number": "1234567",
-  "username": "Samo",
-  "password": "pbkdf2:sha256:260000$FhLRjDdof5PvJGbT$53bf03b2eaabc63a55dc6eb4b734d135fd3585abc1f6b1b2ba13dfbcf7c34af1"
- }
+"aramg267@gmail.com": {
+    "phone_number": "435345345",
+    "username": "aram",
+    "password": "pbkdf2:sha256:260000$sp7cLsk620344n1q$887e6d35ba84eb2393dd9a2bd8104b953c270f6ef7d351ae013b519dcdba397e"
+}
 }

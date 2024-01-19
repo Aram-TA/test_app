@@ -31,7 +31,8 @@ def index() -> Response:
     None
 
     """
-    with open(DataConstructor.posts_path, "r") as posts:
+    with open(DataConstructor.posts_path, "r") as posts_file:
+        posts = json.load(posts_file)
         return render_template(
             "blog/index.html",
             posts=posts,
@@ -87,7 +88,7 @@ def create() -> Response:
             "author_email": session["email"],
             "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        json.dump(data)
+        json.dump(data, posts_json, indent=2)
     return redirect(url_for("index"))
 
 
@@ -137,7 +138,7 @@ def update_post(id: str) -> Response:
             "author_email": session["email"],
             "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        json.dump(data)
+        json.dump(data, posts_json, indent=2)
 
         return redirect(url_for("index"))
 
