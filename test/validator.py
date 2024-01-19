@@ -6,163 +6,152 @@ from werkzeug.security import check_password_hash
 from data_constructor import DataConstructor
 
 
-def validate_phone_number(phone_number: str) -> None | str:
-    """
-    Validates phone number by using regex
+class Validator:
+    def __init__(self) -> None:
+        self.email: str | None = None
+        self.phone_number: str | None = None
+        self.username: str | None = None
+        self.password_repeat: str | None = None
+        self.password: str | None = None
+        self.login_mode: bool = False
 
-    Parameters
-    -----------
-    phone_number: str
+    def validate_phone_number(self, user_data: dict) -> None | str:
+        """
+        Validates phone number by using regex
 
-    Returns
-    -------
-    str | None
+        Parameters
+        -----------
+        user_data: dict
 
-    """
-    if re.match(r'^[\d+\- ]{6,20}$', phone_number) is None:
-        return """\t\t\tInvalid phone number.
-                  Please use right format for phone number."""
+        Returns
+        -------
+        str | None
 
+        """
+        if re.match(r'^[\d+\- ]{6,20}$', self.phone_number) is None:
+            return """\t\t\tInvalid phone number.
+                    Please use right format for phone number."""
 
-def validate_password(
-    email: str,
-    password: str,
-    user_data: dict,
-    login_mode: bool = False
-) -> None | str:
-    """
-    Validates password by using hash function
+    def validate_password(self, user_data: dict) -> None | str:
+        """
+        Validates password by using hash function
 
-    Parameters
-    -----------
-    email: str
-    password: str
-    user_data: dict
-    login_mode: bool
+        Parameters
+        -----------
+        user_data: dict
 
-    Returns
-    -------
-    str | None
+        Returns
+        -------
+        str | None
 
-    """
-    if not password:
-        return "Password is required."
-    if login_mode:
-        if not check_password_hash(user_data[email]["password"], password):
-            return "Incorrect password"
+        """
+        if not self.password:
+            return "Password is required."
 
+        if self.login_mode:
+            if not check_password_hash(
+                user_data[self.email]["password"],
+                self.password
+            ):
+                return "Incorrect password"
 
-def validate_email(
-    email: str,
-    user_data: dict,
-    login_mode: bool = False
-) -> None | str:
-    """
-    Validates email by using regex
+    def validate_email(self, user_data: dict) -> None | str:
+        """
+        Validates email by using regex
 
-    Parameters
-    -----------
-    email: str
-    user_data: dict
-    login_mode: bool
+        Parameters
+        -----------
+        user_data: dict
 
-    Returns
-    -------
-    str | None
+        Returns
+        -------
+        str | None
 
-    """
-    if not email:
-        return "Email is required"
+        """
+        if not self.email:
+            return "Email is required"
 
-    elif re.match(
-        r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email
-    ) is None:
+        elif re.match(
+            r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', self.email
+        ) is None:
 
-        return "Invalid email format. Please use correct email format."
+            return "Invalid email format. Please use correct email format."
 
-    if login_mode:
-        print(email)
-        print(user_data)
-        if email not in user_data:
-            return "User with that email not found."
+        if self.login_mode:
+            if self.email not in user_data:
+                return "User with that email not found."
 
+    def validate_login(self, email: str, password: str) -> None | str:
+        """
+        Validates login by using some functions above
 
-def validate_login(email: str, password: str) -> None | str:
-    """
-    Validates login by using some functions above
+        Parameters
+        -----------
+        email: str
+        password: str
 
-    Parameters
-    -----------
-    email: str
-    password: str
+        Returns
+        -------
+        str | None
 
-    Returns
-    -------
-    str | None
+        """
+        self.email: str = email
+        self.password: str = password
+        self.login_mode: bool = True
 
-    """
-    with open(DataConstructor.users_path, "r") as users_data:
-        data = json.load(users_data)
-        error = validate_email(
-            email,
-            data,
-            True
-        )
-        if error:
-            return error
+        with open(DataConstructor.users_path, "r") as users_data:
+            users = json.load(users_data)
 
-        error = validate_password(
-            email,
-            password,
-            data,
-            True
-        )
-        if error:
-            return error
+            funclist = [self.validate_email, self.validate_password]
 
+            for func in funclist:
+                error = func(users)
+                if error:
+                    return error
 
-def validate_registration(
-    email: str,
-    phone_number: str,
-    username: str,
-    password: str,
-    password_repeat: str
-) -> None | str:
-    """
-    Validates registration by using some functions above
-
-    Parameters
-    -----------
-    email: str
-    phone_number: str
-    username: str
-    password: str
-    password_repeat: str
-
-    Returns
-    -------
-    str | None
-
-    """
-    with open(DataConstructor.users_path, "r") as users_data:
-        error = validate_email(
-            email,
-            users_data
-        )
-        if error:
-            return error
-
-        error = validate_phone_number(phone_number)
-        if error:
-            return error
-
-        if password != password_repeat:
+    def validate_password_repeat(self):
+        if self.password != self.password_repeat:
             return "Passwords in both fields should be same."
 
-        error = validate_password(
-            email,
-            password,
-            users_data
-        )
-        if error:
-            return error
+    def validate_registration(
+        self,
+        email: str,
+        phone_number: str,
+        username: str,
+        password: str,
+        password_repeat: str
+    ) -> None | str:
+        """
+        Validates registration by using some functions above
+
+        Parameters
+        -----------
+        email: str
+        phone_number: str
+        username: str
+        password: str
+        password_repeat: str
+
+        Returns
+        -------
+        str | None
+
+        """
+        self.email: str = email
+        self.phone_number: str = phone_number
+        self.username: str = username
+        self.password_repeat: str = password_repeat
+
+        with open(DataConstructor.users_path, "r") as users_data:
+            users = json.load(users_data)
+
+            funclist = [
+                self.validate_email,
+                self.validate_phone_number,
+                self.validate_password_repeat,
+                self.validate_password
+            ]
+            for func in funclist:
+                error = func(users)
+                if error:
+                    return error

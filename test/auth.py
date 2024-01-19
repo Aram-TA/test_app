@@ -13,14 +13,12 @@ from flask import (
     Response
 )
 
-from validator import (
-    validate_registration,
-    validate_login
-)
+from validator import Validator
 from data_constructor import DataConstructor
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 function = NewType("function", Any)
+validator = Validator()
 
 
 def save_registered_account(
@@ -72,8 +70,8 @@ def register() -> Response:
     """
     if request.method != "POST":
         return render_template("auth/register.html")
-    print(request.form)
-    error = validate_registration(
+
+    error = validator.validate_registration(
         **request.form
     )
     if error:
@@ -104,7 +102,7 @@ def login() -> Response:
 
     email = request.form["email"]
 
-    error = validate_login(email, request.form["password"])
+    error = validator.validate_login(email, request.form["password"])
     if error:
         return render_template("auth/login.html", error=error)
 
