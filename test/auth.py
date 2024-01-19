@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import function, Any, NewType
+from typing import Callable, Any, NewType, function
 
 from flask import (
     render_template,
@@ -91,6 +91,7 @@ def register() -> Response:
 def login() -> Response:
     """
     Does some validation for login then if it succeed redirects to index page
+    Also handles current session of logged in user
 
     Parameters
     -----------
@@ -135,18 +136,18 @@ def logout() -> Response:
     return redirect(url_for("index"))
 
 
-def login_required(view: function) -> function:
+def login_required(view: function) -> Callable:
     """
     Decorator that checks is user logged in or not,
     if not redirects to login page
 
     Parameters
     -----------
-    function
+    view: function
 
     Returns
     -------
-    function
+    Callable
 
     """
     @wraps(view)

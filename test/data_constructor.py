@@ -1,15 +1,16 @@
+from typing import ClassVar
 from datetime import datetime
 import json
 import os
 
 
 class DataConstructor:
-    users_path = "data/users.json"
-    posts_path = "data/posts.json"
-    current_post_id_path = "data/current_post_id.txt"
+    users_path: ClassVar = "data/users.json"
+    posts_path: ClassVar = "data/posts.json"
+    current_post_id_path: ClassVar = "data/current_post_id.txt"
 
     @classmethod
-    def init_data(cls):
+    def init_data(cls) -> None:
         """
         Creates all necessary dirs if they does't exist
 
@@ -36,9 +37,15 @@ class DataConstructor:
                 current_post_id_file.write("1")
 
     @classmethod
-    def insert_post(cls, id: int, title: str, body: str, author_email: str):
+    def insert_post(
+        cls,
+        id: int,
+        title: str,
+        body: str,
+        author_email: str
+    ) -> None:
         """
-        Inserts or changes new key-value pair to posts_data global variable
+        Inserts or changes new key-value pairs to posts database
 
         Parameters
         -----------
@@ -65,7 +72,7 @@ class DataConstructor:
         cls.write_data(cls.posts_path, data)
 
     @staticmethod
-    def write_data(path: str, data: dict):
+    def write_data(path: str, data: dict) -> None:
         """
         Writes received data to target path
 
@@ -119,7 +126,7 @@ class DataConstructor:
         return current_post_id
 
     @classmethod
-    def load_posts_data(cls):
+    def load_posts_data(cls) -> dict:
         """
         Loads post data from json file
 

@@ -5,15 +5,45 @@ from werkzeug.security import check_password_hash
 from data_constructor import DataConstructor
 
 
-def validate_phone_number(phone_number: str):
+def validate_phone_number(phone_number: str) -> None | str:
+    """
+    Validates phone number by using regex
+
+    Parameters
+    -----------
+    phone_number: str
+
+    Returns
+    -------
+    str | None
+
+    """
     if re.match(r'^[\d+\- ]{6,20}$', phone_number) is None:
         return """\t\t\tInvalid phone number.
                   Please use right format for phone number."""
 
 
 def validate_password(
-    email: str, password: str, user_data: str, login_mode: bool = False
-):
+    email: str,
+    password: str,
+    user_data: dict,
+    login_mode: bool = False
+) -> None | str:
+    """
+    Validates password by using hash function
+
+    Parameters
+    -----------
+    email: str
+    password: str
+    user_data: dict
+    login_mode: bool
+
+    Returns
+    -------
+    str | None
+
+    """
     if not password:
         return "Password is required."
     if login_mode:
@@ -21,7 +51,25 @@ def validate_password(
             return "Incorrect password"
 
 
-def validate_email(email: str, user_data: dict, login_mode: bool = False):
+def validate_email(
+    email: str,
+    user_data: dict,
+    login_mode: bool = False
+) -> None | str:
+    """
+    Validates email by using regex
+
+    Parameters
+    -----------
+    email: str
+    user_data: dict
+    login_mode: bool
+
+    Returns
+    -------
+    str | None
+
+    """
     if not email:
         return "Email is required"
 
@@ -36,7 +84,20 @@ def validate_email(email: str, user_data: dict, login_mode: bool = False):
             return "User with that email not found."
 
 
-def validate_login(email, password):
+def validate_login(email: str, password: str) -> None | str:
+    """
+    Validates login by using some functions above
+
+    Parameters
+    -----------
+    email: str
+    password: str
+
+    Returns
+    -------
+    str | None
+
+    """
     error = validate_email(
         email,
         DataConstructor.load_user_data(),
@@ -44,7 +105,6 @@ def validate_login(email, password):
     )
     if error:
         return error
-    print("Email validated")
 
     error = validate_password(
         email,
@@ -56,7 +116,25 @@ def validate_login(email, password):
         return error
 
 
-def validate_registration(email, phone_number, password, repeated_password):
+def validate_registration(
+    email: str,
+    phone_number: str,
+    password: str,
+    repeated_password: str
+) -> None | str:
+    """
+    Validates registration by using some functions above
+
+    Parameters
+    -----------
+    email: str
+    password: str
+
+    Returns
+    -------
+    str | None
+
+    """
     error = validate_email(
         email,
         DataConstructor.load_user_data()
