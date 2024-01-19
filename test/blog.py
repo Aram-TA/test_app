@@ -1,3 +1,5 @@
+from typing import Any, NewType
+
 from flask import (
     url_for,
     request,
@@ -12,10 +14,11 @@ from auth import login_required
 from data_constructor import DataConstructor
 
 bp = Blueprint("blog", __name__)
+Response = NewType("Response", Any)
 
 
 @bp.route("/")
-def index():
+def index() -> Response:
     """
     Returns rendered index template when client goes to "/" url
 
@@ -37,7 +40,7 @@ def index():
 
 @bp.route("/create", methods=("GET", "POST"))
 @login_required
-def create():
+def create() -> Response:
     """
     Does validations for post creating process then writes new data by using
     data constructor. Then redirects to index if everything is OK.
@@ -75,7 +78,7 @@ def create():
 
 @bp.route("/<id>/update", methods=("GET", "POST"))
 @login_required
-def update_post(id):
+def update_post(id: str) -> Response:
     """
     Does validations for post updating process then updates data by using
     data constructor. Then redirects to index if everything is OK.
@@ -115,7 +118,7 @@ def update_post(id):
 
 @bp.route('/<id>/delete', methods=('POST', "GET"))
 @login_required
-def delete(id):
+def delete(id) -> Response:
     """
     Deletes post by id then applies changes to data by using data constructor
     Aborts operation with 404 http error if post id does't found.

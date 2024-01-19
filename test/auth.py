@@ -1,4 +1,5 @@
 from functools import wraps
+from typing import function, Any, NewType
 
 from flask import (
     render_template,
@@ -8,21 +9,38 @@ from flask import (
     session,
     url_for,
 )
-
 from werkzeug.security import generate_password_hash
 
 from data_constructor import DataConstructor
-
 from validator import (
     validate_registration,
     validate_login
 )
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
+Response = NewType("Response", Any)
 
 
-def save_registered_account(email, phone_number, username, password):
+def save_registered_account(
+    email: str,
+    phone_number: str,
+    username: str,
+    password: str
+) -> None:
+    """
+    Loads data from database and after inserts new values there
+
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    None
+
+    """
     data = DataConstructor.load_user_data()
+
     data[email] = {
         "phone_number": phone_number,
         "username": username,
@@ -35,7 +53,7 @@ def save_registered_account(email, phone_number, username, password):
 
 
 @bp.route("/register", methods=("GET", "POST"))
-def register():
+def register() -> Response:
     """
     Does some validation for registration then if it succeed redirects to login
 
@@ -70,7 +88,7 @@ def register():
 
 
 @bp.route("/login", methods=("GET", "POST"))
-def login():
+def login() -> Response:
     """
     Does some validation for login then if it succeed redirects to index page
 
@@ -100,7 +118,7 @@ def login():
 
 
 @bp.route("/logout")
-def logout():
+def logout() -> Response:
     """
     Clears all data of current flask session and redirects to index page
 
@@ -117,7 +135,7 @@ def logout():
     return redirect(url_for("index"))
 
 
-def login_required(view):
+def login_required(view: function) -> function:
     """
     Decorator that checks is user logged in or not,
     if not redirects to login page
