@@ -1,4 +1,5 @@
 import json
+from typing import NewType, Any
 from datetime import datetime
 
 from flask import (
@@ -15,6 +16,109 @@ from auth import login_required
 from data_constructor import DataConstructor
 
 bp = Blueprint("blog", __name__)
+File = NewType("File", Any)
+
+
+def posts_deleter(id: str) -> None:
+    """
+    Deletes post by id from data
+    Parameters
+    -----------
+    id: str
+
+    Returns
+    -------
+    None
+
+    """
+    with open(DataConstructor.posts_path, "r+") as posts_json:
+        data = json.load(posts_json)
+
+        posts_json.seek(0)
+        posts_json.truncate()
+
+        del data[id]
+
+        json.dump(data, posts_json, indent=2)
+
+
+def post_updater(
+    posts_data: dict,
+    posts_json: File,
+    id: str,
+    title: str,
+    body: str = ""
+) -> None:
+    """
+    Updates post and saves new updated data
+
+    Parameters
+    -----------
+    posts_data: dict
+    posts_json: File
+    id: str
+    title: str
+    body: str
+
+    Returns
+    -------
+    None
+
+    """
+    posts_json.seek(0)
+    posts_json.truncate()
+
+    posts_data[id] = {
+        "id": id,
+        "title": title,
+        "body": body,
+        "author": session["username"],
+        "author_email": session["current_user"],
+        "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    json.dump(posts_data, posts_json, indent=2)
+
+
+def post_creator(title: str, body: str = "") -> None:
+    """
+    Creates post and saves it's data
+
+    Parameters
+    -----------
+    title: str
+    body: str
+
+    Returns
+    -------
+    None
+
+    """
+    with open(
+        DataConstructor.current_post_id_path, "r+"
+    ) as current_post_id_file:
+
+        id = current_post_id_file.read()
+
+        current_post_id_file.seek(0)
+        current_post_id_file.truncate()
+
+        current_post_id_file.write(str(int(id) + 1))
+
+    with open(DataConstructor.posts_path, "r+") as posts_json:
+        data = json.load(posts_json)
+
+        posts_json.seek(0)
+        posts_json.truncate()
+
+        data[id] = {
+            "id": id,
+            "title": title,
+            "body": body,
+            "author": session["username"],
+            "author_email": session["current_user"],
+            "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        json.dump(data, posts_json, indent=2)
 
 
 @bp.route("/")
@@ -28,15 +132,14 @@ def index() -> Response:
 
     Returns
     -------
-    None
+    Response
 
     """
     with open(DataConstructor.posts_path, "r") as posts_file:
-        posts = json.load(posts_file)
+        data = json.load(posts_file)
         return render_template(
             "blog/index.html",
-            posts=posts,
-            session=session
+            posts=data,
         )
 
 
@@ -53,43 +156,26 @@ def create() -> Response:
 
     Returns
     -------
-    None
+    Response
 
     """
-    if request.method != "POST":
+    if request.method == "POST":
+
+        title = request.form["title"]
+        body = request.form["body"]
+
+        if not title:
+            return render_template(
+                "blog/create.html",
+                error="Title is required"
+            )
+
+        post_creator(title, body)
+
+        return redirect(url_for("index"))
+
+    else:
         return render_template("blog/create.html")
-
-    title = request.form["title"]
-    body = request.form["body"]
-
-    if not title:
-        return render_template("blog/create.html", error="Title is required")
-
-    with open(
-        DataConstructor.current_post_id_path, "r+"
-    ) as current_post_id_file:
-
-        current_post_id = current_post_id_file.read()
-        current_post_id_file.seek(0)
-        current_post_id_file.truncate()
-        current_post_id_file.write(str(int(current_post_id) + 1))
-
-    with open(DataConstructor.posts_path, "r+") as posts_json:
-        data = json.load(posts_json)
-
-        posts_json.seek(0)
-        posts_json.truncate()
-
-        data[id] = {
-            "id": id,
-            "title": title,
-            "body": body,
-            "author": session["username"],
-            "author_email": session["email"],
-            "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        json.dump(data, posts_json, indent=2)
-    return redirect(url_for("index"))
 
 
 @bp.route("/<id>/update", methods=("GET", "POST"))
@@ -101,75 +187,50 @@ def update_post(id: str) -> Response:
 
     Parameters
     -----------
-    None
+    id: str
 
     Returns
     -------
-    None
+    Response
 
     """
     with open(DataConstructor.posts_path, "r+") as posts_json:
-        if request.method != "POST":
-            return render_template(
-                "blog/update.html",
-                post=posts_json[id]
-            )
+        posts_data = json.load(posts_json)
 
-        title = request.form["title"]
-        body = request.form["body"]
+        if request.method == "POST":
 
-        if not title:
-            return render_template(
-                "blog/update.html",
-                post=posts_json,
-                error="Title is required."
-            )
+            title = request.form["title"]
+            body = request.form["body"]
 
-        data = json.load(posts_json)
+            if not title:
+                return render_template(
+                    "blog/update.html",
+                    post=posts_data[id],
+                    error="Title is required"
+                )
 
-        posts_json.seek(0)
-        posts_json.truncate()
+            post_updater(posts_data, posts_json, id, title, body)
 
-        data[id] = {
-            "id": id,
-            "title": title,
-            "body": body,
-            "author": session["username"],
-            "author_email": session["email"],
-            "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        json.dump(data, posts_json, indent=2)
+            return redirect(url_for("index"))
 
-        return redirect(url_for("index"))
+        else:
+            return render_template("blog/update.html", post=posts_data[id])
 
 
-@bp.route('/<id>/delete', methods=('POST', "GET"))
+@bp.route('/<id>/delete', methods=('POST',))
 @login_required
 def delete(id) -> Response:
     """
     Deletes post by id then applies changes to data by using data constructor
-    Aborts operation with 404 http error if post id does't found.
 
     Parameters
     -----------
-    None
+    id: str
 
     Returns
     -------
-    None
+    Response
 
     """
-    try:
-        data = DataConstructor.load_posts_data()
-        del data[id]
-        DataConstructor.write_data(
-            DataConstructor.posts_path,
-            data
-            )
-    except KeyError:
-        return render_template(
-            "blog/update.html",
-            post=DataConstructor.load_posts_data()[id],
-            error=f"Post id {id} doesn't exist."
-        )
+    posts_deleter(id)
     return redirect(url_for('index'))

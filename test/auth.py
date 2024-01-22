@@ -17,7 +17,7 @@ from validator import Validator
 from data_constructor import DataConstructor
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
-function = NewType("function", Any)
+Function = NewType("Function", Any)
 validator = Validator()
 
 
@@ -33,7 +33,11 @@ def save_registered_account(
 
     Parameters
     -----------
-    None
+    email: str
+    phone_number: str
+    username: str
+    password: str
+    password_repeat: str
 
     Returns
     -------
@@ -68,7 +72,7 @@ def register() -> Response:
     Response
 
     """
-    if request.method != "POST":
+    if request.method == "GET":
         return render_template("auth/register.html")
 
     error = validator.validate_registration(
@@ -97,18 +101,21 @@ def login() -> Response:
     Response
 
     """
-    if request.method != "POST":
+    if request.method == "GET":
         return render_template("auth/login.html")
 
     email = request.form["email"]
 
     error = validator.validate_login(email, request.form["password"])
+
     if error:
         return render_template("auth/login.html", error=error)
 
     with open(DataConstructor.users_path, "r") as users_file:
         users = json.load(users_file)
+
         session.clear()
+
         session["current_user"] = email
         session["username"] = users[email]["username"]
 
@@ -133,7 +140,7 @@ def logout() -> Response:
     return redirect(url_for("index"))
 
 
-def login_required(view: function) -> Callable:
+def login_required(view: Function) -> Callable:
     """
     Decorator that checks is user logged in or not,
     if not redirects to login page
@@ -149,7 +156,10 @@ def login_required(view: function) -> Callable:
     """
     @wraps(view)
     def wrapped_view(**kwargs):
+
         if session.get("current_user") is None:
             return redirect(url_for("auth.login"))
+
         return view(**kwargs)
+
     return wrapped_view

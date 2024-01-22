@@ -102,7 +102,7 @@ class Validator:
         with open(DataConstructor.users_path, "r") as users_data:
             users = json.load(users_data)
 
-            funclist = [self.validate_email, self.validate_password]
+            funclist = (self.validate_email, self.validate_password)
 
             for func in funclist:
                 error = func(users)
@@ -145,12 +145,12 @@ class Validator:
         with open(DataConstructor.users_path, "r") as users_data:
             users = json.load(users_data)
 
-            funclist = [
+            funclist = (
                 self.validate_email,
                 self.validate_phone_number,
                 self.validate_password_repeat,
                 self.validate_password
-            ]
+            )
             for func in funclist:
                 error = func(users)
                 if error:
