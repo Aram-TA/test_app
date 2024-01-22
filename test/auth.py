@@ -2,7 +2,6 @@ import json
 from functools import wraps
 from typing import Callable, Any, NewType
 
-from werkzeug.security import generate_password_hash
 from flask import (
     render_template,
     Blueprint,
@@ -15,42 +14,12 @@ from flask import (
 
 from validator import Validator
 from config import get_config
+from datahandler import save_registered_account
 
 config = get_config()
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 Function = NewType("Function", Any)
 validator = Validator()
-
-
-def save_registered_account(request_form: dict) -> None:
-    """
-    Loads data from database and after inserts new values there
-
-    Parameters
-    -----------
-    email: str
-    phone_number: str
-    username: str
-    password: str
-    password_repeat: str
-
-    Returns
-    -------
-    None
-
-    """
-    with open(config["users_path"], "r+") as users_json:
-        data = json.load(users_json)
-        data[request_form["email"]] = {
-            "phone_number": request_form["phone_number"],
-            "username": request_form["username"],
-            "password": generate_password_hash(request_form["password"]),
-        }
-
-        users_json.seek(0)
-        users_json.truncate()
-
-        json.dump(data, users_json, indent=2)
 
 
 @bp.route("/register", methods=("GET", "POST"))
