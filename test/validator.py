@@ -14,8 +14,9 @@ class Validator:
         self.password_repeat: str | None = None
         self.password: str | None = None
         self.login_mode: bool = False
+        self.user_data: dict | None = None
 
-    def validate_phone_number(self, user_data: dict) -> None | str:
+    def validate_phone_number(self) -> None | str:
         """
         Validates phone number by using regex
 
@@ -32,13 +33,13 @@ class Validator:
             return """\t\t\tInvalid phone number.
                     Please use right format for phone number."""
 
-    def validate_password(self, user_data: dict) -> None | str:
+    def validate_password(self) -> None | str:
         """
         Validates password by using hash function
 
         Parameters
         -----------
-        user_data: dict
+        None
 
         Returns
         -------
@@ -50,18 +51,18 @@ class Validator:
 
         if self.login_mode:
             if not check_password_hash(
-                user_data[self.email]["password"],
+                self.user_data[self.email]["password"],
                 self.password
             ):
                 return "Incorrect password"
 
-    def validate_email(self, user_data: dict) -> None | str:
+    def validate_email(self) -> None | str:
         """
         Validates email by using regex
 
         Parameters
         -----------
-        user_data: dict
+        None
 
         Returns
         -------
@@ -71,17 +72,18 @@ class Validator:
         if not self.email:
             return "Email is required"
 
-        elif re.match(
-            r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', self.email
+        if not self.login_mode and re.match(
+                r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',
+                self.email
         ) is None:
 
             return "Invalid email format. Please use correct email format."
 
         if self.login_mode:
-            if self.email not in user_data:
+            if self.email not in self.user_data:
                 return "User with that email not found."
 
-    def validate_login(self, email: str, password: str) -> None | str:
+    def validate_login(self, request_form: dict) -> None | str:
         """
         Validates login by using some functions above
 
@@ -95,32 +97,26 @@ class Validator:
         str | None
 
         """
-        self.email: str = email
-        self.password: str = password
+        self.email: str = request_form["email"]
+        self.password: str = request_form["password"]
         self.login_mode: bool = True
 
         with open(DataConstructor.users_path, "r") as users_data:
-            users = json.load(users_data)
+            self.user_data = json.load(users_data)
 
-            funclist = (self.validate_email, self.validate_password)
+        funclist = ("email", "password")
 
-            for func in funclist:
-                error = func(users)
-                if error:
-                    return error
+        for func in funclist:
+            error = getattr(self, f"validate_{func}")()
+
+            if error:
+                return error
 
     def validate_password_repeat(self):
         if self.password != self.password_repeat:
             return "Passwords in both fields should be same."
 
-    def validate_registration(
-        self,
-        email: str,
-        phone_number: str,
-        username: str,
-        password: str,
-        password_repeat: str
-    ) -> None | str:
+    def validate_registration(self, request_form: dict) -> None | str:
         """
         Validates registration by using some functions above
 
@@ -137,21 +133,22 @@ class Validator:
         str | None
 
         """
-        self.email: str = email
-        self.phone_number: str = phone_number
-        self.username: str = username
-        self.password_repeat: str = password_repeat
+        self.email: str = request_form["email"]
+        self.phone_number: str = request_form["phone_number"]
+        self.username: str = request_form["username"]
+        self.password_repeat: str = request_form["password_repeat"]
 
         with open(DataConstructor.users_path, "r") as users_data:
-            users = json.load(users_data)
+            self.user_data = json.load(users_data)
 
-            funclist = (
-                self.validate_email,
-                self.validate_phone_number,
-                self.validate_password_repeat,
-                self.validate_password
-            )
-            for func in funclist:
-                error = func(users)
-                if error:
-                    return error
+        funclist = (
+            "email",
+            "phone_number",
+            "password_repeat",
+            "password"
+        )
+        for func in funclist:
+            error = getattr(self, f"validate_{func}")()
+
+            if error:
+                return error

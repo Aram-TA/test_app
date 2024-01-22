@@ -21,13 +21,7 @@ Function = NewType("Function", Any)
 validator = Validator()
 
 
-def save_registered_account(
-    email: str,
-    phone_number: str,
-    username: str,
-    password: str,
-    password_repeat: str
-) -> None:
+def save_registered_account(request_form: dict) -> None:
     """
     Loads data from database and after inserts new values there
 
@@ -46,10 +40,10 @@ def save_registered_account(
     """
     with open(DataConstructor.users_path, "r+") as users_json:
         data = json.load(users_json)
-        data[email] = {
-            "phone_number": phone_number,
-            "username": username,
-            "password": generate_password_hash(password),
+        data[request_form["email"]] = {
+            "phone_number": request_form["phone_number"],
+            "username": request_form["username"],
+            "password": generate_password_hash(request_form["password"]),
         }
 
         users_json.seek(0)
@@ -76,12 +70,12 @@ def register() -> Response:
         return render_template("auth/register.html")
 
     error = validator.validate_registration(
-        **request.form
+        request.form
     )
     if error:
         return render_template("auth/register.html", error=error)
 
-    save_registered_account(**request.form)
+    save_registered_account(request.form)
 
     return redirect(url_for("auth.login"))
 

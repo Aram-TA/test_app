@@ -1,6 +1,6 @@
 import json
-from typing import NewType, Any
 from datetime import datetime
+from typing import NewType, Any
 
 from flask import (
     url_for,

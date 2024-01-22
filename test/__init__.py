@@ -1,8 +1,8 @@
 from flask import Flask
 
-from data_constructor import DataConstructor
 import blog
 import auth
+from data_constructor import DataConstructor
 
 DataConstructor.init_data()
 app = Flask(__name__)
