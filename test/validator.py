@@ -3,11 +3,12 @@ import json
 
 from werkzeug.security import check_password_hash
 
-from data_constructor import DataConstructor
+from config import get_config
 
 
 class Validator:
     def __init__(self) -> None:
+        self.config = get_config()
         self.email: str | None = None
         self.phone_number: str | None = None
         self.username: str | None = None
@@ -101,7 +102,7 @@ class Validator:
         self.password: str = request_form["password"]
         self.login_mode: bool = True
 
-        with open(DataConstructor.users_path, "r") as users_data:
+        with open(self.config["users_path"], "r") as users_data:
             self.user_data = json.load(users_data)
 
         funclist = ("email", "password")
@@ -138,7 +139,7 @@ class Validator:
         self.username: str = request_form["username"]
         self.password_repeat: str = request_form["password_repeat"]
 
-        with open(DataConstructor.users_path, "r") as users_data:
+        with open(self.config["users_path"], "r") as users_data:
             self.user_data = json.load(users_data)
 
         funclist = (

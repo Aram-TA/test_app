@@ -13,13 +13,14 @@ from flask import (
 )
 
 from auth import login_required
-from data_constructor import DataConstructor
+from config import get_config
 
+config = get_config()
 bp = Blueprint("blog", __name__)
 File = NewType("File", Any)
 
 
-def posts_deleter(id: str) -> None:
+def do_post_delete(id: str) -> None:
     """
     Deletes post by id from data
     Parameters
@@ -31,7 +32,7 @@ def posts_deleter(id: str) -> None:
     None
 
     """
-    with open(DataConstructor.posts_path, "r+") as posts_json:
+    with open(config["posts_path"], "r+") as posts_json:
         data = json.load(posts_json)
 
         posts_json.seek(0)
@@ -42,7 +43,7 @@ def posts_deleter(id: str) -> None:
         json.dump(data, posts_json, indent=2)
 
 
-def post_updater(
+def do_post_update(
     posts_data: dict,
     posts_json: File,
     id: str,
@@ -79,7 +80,7 @@ def post_updater(
     json.dump(posts_data, posts_json, indent=2)
 
 
-def post_creator(title: str, body: str = "") -> None:
+def create_new_post(title: str, body: str = "") -> None:
     """
     Creates post and saves it's data
 
@@ -94,7 +95,7 @@ def post_creator(title: str, body: str = "") -> None:
 
     """
     with open(
-        DataConstructor.current_post_id_path, "r+"
+        config["current_post_id_path"], "r+"
     ) as current_post_id_file:
 
         id = current_post_id_file.read()
@@ -104,7 +105,7 @@ def post_creator(title: str, body: str = "") -> None:
 
         current_post_id_file.write(str(int(id) + 1))
 
-    with open(DataConstructor.posts_path, "r+") as posts_json:
+    with open(config["posts_path"], "r+") as posts_json:
         data = json.load(posts_json)
 
         posts_json.seek(0)
@@ -135,7 +136,7 @@ def index() -> Response:
     Response
 
     """
-    with open(DataConstructor.posts_path, "r") as posts_file:
+    with open(config["posts_path"], "r") as posts_file:
         data = json.load(posts_file)
         return render_template(
             "blog/index.html",
@@ -170,7 +171,7 @@ def create() -> Response:
                 error="Title is required"
             )
 
-        post_creator(title, body)
+        create_new_post(title, body)
 
         return redirect(url_for("index"))
 
@@ -194,7 +195,7 @@ def update_post(id: str) -> Response:
     Response
 
     """
-    with open(DataConstructor.posts_path, "r+") as posts_json:
+    with open(config["posts_path"], "r+") as posts_json:
         posts_data = json.load(posts_json)
 
         if request.method == "POST":
@@ -209,7 +210,7 @@ def update_post(id: str) -> Response:
                     error="Title is required"
                 )
 
-            post_updater(posts_data, posts_json, id, title, body)
+            do_post_update(posts_data, posts_json, id, title, body)
 
             return redirect(url_for("index"))
 
@@ -232,5 +233,5 @@ def delete(id) -> Response:
     Response
 
     """
-    posts_deleter(id)
+    do_post_delete(id)
     return redirect(url_for('index'))

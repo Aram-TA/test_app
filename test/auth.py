@@ -14,8 +14,9 @@ from flask import (
 )
 
 from validator import Validator
-from data_constructor import DataConstructor
+from config import get_config
 
+config = get_config()
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 Function = NewType("Function", Any)
 validator = Validator()
@@ -38,7 +39,7 @@ def save_registered_account(request_form: dict) -> None:
     None
 
     """
-    with open(DataConstructor.users_path, "r+") as users_json:
+    with open(config["users_path"], "r+") as users_json:
         data = json.load(users_json)
         data[request_form["email"]] = {
             "phone_number": request_form["phone_number"],
@@ -105,7 +106,7 @@ def login() -> Response:
     if error:
         return render_template("auth/login.html", error=error)
 
-    with open(DataConstructor.users_path, "r") as users_file:
+    with open(config["users_path"], "r") as users_file:
         users = json.load(users_file)
 
         session.clear()

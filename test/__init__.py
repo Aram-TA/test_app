@@ -1,10 +1,28 @@
+import os
+import json
 from flask import Flask
 
 import blog
 import auth
-from data_constructor import DataConstructor
+from config import get_config
 
-DataConstructor.init_data()
+config = get_config()
+
+if not os.path.exists("data"):
+    os.mkdir("data")
+
+if not os.path.exists(config["users_path"]):
+    with open(config["users_path"], "w") as users_file:
+        json.dump({}, users_file, indent=2)
+
+if not os.path.exists(config["posts_path"]):
+    with open(config["posts_path"], "w") as posts_file:
+        json.dump({}, posts_file, indent=2)
+
+if not os.path.exists(config["current_post_id_path"]):
+    with open(config["current_post_id_path"], "w") as current_post_id_file:
+        current_post_id_file.write("1")
+
 app = Flask(__name__)
 
 
