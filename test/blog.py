@@ -1,5 +1,3 @@
-import json
-
 from flask import (
     url_for,
     request,
@@ -9,11 +7,9 @@ from flask import (
     render_template,
 )
 
-import config
 from auth import login_required
-from datahandler import PostSetter
+from datahandler import PostSetter, get_posts_data
 
-post_setter = PostSetter()
 bp = Blueprint("blog", __name__)
 
 
@@ -31,11 +27,9 @@ def index() -> Response:
     Response
 
     """
-    with open(config.posts_path, "r") as posts_file:
-        data = json.load(posts_file)
-        return render_template(
+    return render_template(
             "blog/index.html",
-            posts=data,
+            posts=get_posts_data(),
         )
 
 
@@ -65,7 +59,7 @@ def create_post() -> Response:
                 error="Title is required"
             )
 
-        post_setter.set_post("create", None, title, request.form["body"])
+        PostSetter().set_post("create", None, title, request.form["body"])
 
         return redirect(url_for("index"))
 
@@ -89,22 +83,19 @@ def update_post(id: str) -> Response:
     Response
 
     """
-    with open(config.posts_path, "r+") as posts_json:
-        posts_data = json.load(posts_json)
+    if request.method == "POST":
 
-        if request.method == "POST":
+        PostSetter().set_post(
+            "update",
+            id,
+            request.form["title"],
+            request.form["body"]
+        )
 
-            post_setter.set_post(
-                "update",
-                id,
-                request.form["title"],
-                request.form["body"]
-            )
+        return redirect(url_for("index"))
 
-            return redirect(url_for("index"))
-
-        else:
-            return render_template("blog/update.html", post=posts_data[id])
+    else:
+        return render_template("blog/update.html", post=get_posts_data()[id])
 
 
 @bp.route('/<id>/delete', methods=('POST',))
@@ -122,5 +113,5 @@ def delete_post(id) -> Response:
     Response
 
     """
-    post_setter.set_post("delete", id, None, None)
+    PostSetter().set_post("delete", id, None, None)
     return redirect(url_for('index'))

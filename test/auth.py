@@ -16,7 +16,6 @@ from datahandler import save_registered_account
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 Function = NewType("Function", Any)
-validator = Validator()
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -36,7 +35,7 @@ def register() -> Response:
     if request.method == "GET":
         return render_template("auth/register.html")
 
-    error = validator.set_account(request.form, login_mode=False)
+    error = Validator().set_account(request.form, login_mode=False)
     if error:
         return render_template("auth/register.html", error=error)
 
@@ -65,7 +64,7 @@ def login() -> Response:
 
     email = request.form["email"]
 
-    error, users_data = validator.set_account(request.form, login_mode=True)
+    error, users_data = Validator().set_account(request.form, login_mode=True)
 
     if error:
         return render_template("auth/login.html", error=error)

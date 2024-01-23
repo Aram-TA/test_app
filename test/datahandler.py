@@ -7,6 +7,11 @@ from werkzeug.security import generate_password_hash
 import config
 
 
+def get_posts_data():
+    with open(config.posts_path, "r") as posts_file:
+        return json.load(posts_file)
+
+
 def save_registered_account(request_form: dict) -> None:
     """
     Loads data from database and after inserts new values there

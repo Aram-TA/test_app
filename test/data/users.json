@@ -1,7 +1,12 @@
 {
-"aramg267@gmail.com": {
+  "aramg267@gmail.com": {
     "phone_number": "435345345",
     "username": "aram",
     "password": "pbkdf2:sha256:260000$sp7cLsk620344n1q$887e6d35ba84eb2393dd9a2bd8104b953c270f6ef7d351ae013b519dcdba397e"
-}
+  },
+  "ryangosling@lonly.com": {
+    "phone_number": "+7-77-77-77-77",
+    "username": "WeCantFixThat",
+    "password": "pbkdf2:sha256:260000$ly90xlxj1H3CDhUC$3e35f4841ae22c589aadcc36f1249f288d2e0f8806a02a152d0d5dbe400983a7"
+  }
 }
