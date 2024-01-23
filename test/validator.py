@@ -3,19 +3,30 @@ import json
 
 from werkzeug.security import check_password_hash
 
-from config import get_config
+import config
 
 
 class Validator:
     def __init__(self) -> None:
-        self.config = get_config()
-        self.email: str | None = None
-        self.phone_number: str | None = None
-        self.username: str | None = None
-        self.password_repeat: str | None = None
-        self.password: str | None = None
+        self.request_form: dict = None
+        self.user_data: dict = None
+        self.email: str = None
+        self.phone_number: str = None
+        self.username: str = None
+        self.password_repeat: str = None
+        self.password: str = None
         self.login_mode: bool = False
-        self.user_data: dict | None = None
+
+    def set_account(self, request_form: dict, login_mode: bool):
+        with open(config.users_path, "r") as users_data:
+            self.user_data = json.load(users_data)
+
+        self.request_form = request_form
+
+        if login_mode:
+            return self.validate_login()
+        else:
+            return self.validate_registration()
 
     def validate_phone_number(self) -> None | str:
         """
@@ -84,26 +95,22 @@ class Validator:
             if self.email not in self.user_data:
                 return "User with that email not found."
 
-    def validate_login(self, request_form: dict) -> None | str:
+    def validate_login(self) -> None | str:
         """
         Validates login by using some functions above
 
         Parameters
         -----------
-        email: str
-        password: str
+        None
 
         Returns
         -------
         str | None
 
         """
-        self.email: str = request_form["email"]
-        self.password: str = request_form["password"]
+        self.email: str = self.request_form["email"]
+        self.password: str = self.request_form["password"]
         self.login_mode: bool = True
-
-        with open(self.config["users_path"], "r") as users_data:
-            self.user_data = json.load(users_data)
 
         funclist = ("email", "password")
 
@@ -111,36 +118,31 @@ class Validator:
             error = getattr(self, f"validate_{func}")()
 
             if error:
-                return error
+                return error, self.user_data
+
+        return None, self.user_data
 
     def validate_password_repeat(self):
         if self.password != self.password_repeat:
             return "Passwords in both fields should be same."
 
-    def validate_registration(self, request_form: dict) -> None | str:
+    def validate_registration(self) -> None | str:
         """
         Validates registration by using some functions above
 
         Parameters
         -----------
-        email: str
-        phone_number: str
-        username: str
-        password: str
-        password_repeat: str
+        None
 
         Returns
         -------
         str | None
 
         """
-        self.email: str = request_form["email"]
-        self.phone_number: str = request_form["phone_number"]
-        self.username: str = request_form["username"]
-        self.password_repeat: str = request_form["password_repeat"]
-
-        with open(self.config["users_path"], "r") as users_data:
-            self.user_data = json.load(users_data)
+        self.email: str = self.request_form["email"]
+        self.phone_number: str = self.request_form["phone_number"]
+        self.username: str = self.request_form["username"]
+        self.password_repeat: str = self.request_form["password_repeat"]
 
         funclist = (
             "email",

@@ -4,24 +4,18 @@ from flask import Flask
 
 import blog
 import auth
-from config import get_config
-
-config = get_config()
+import config
 
 if not os.path.exists("data"):
     os.mkdir("data")
 
-if not os.path.exists(config["users_path"]):
-    with open(config["users_path"], "w") as users_file:
+if not os.path.exists(config.users_path):
+    with open(config.users_path, "w") as users_file:
         json.dump({}, users_file, indent=2)
 
-if not os.path.exists(config["posts_path"]):
-    with open(config["posts_path"], "w") as posts_file:
+if not os.path.exists(config.posts_path):
+    with open(config.posts_path, "w") as posts_file:
         json.dump({}, posts_file, indent=2)
-
-if not os.path.exists(config["current_post_id_path"]):
-    with open(config["current_post_id_path"], "w") as current_post_id_file:
-        current_post_id_file.write("1")
 
 app = Flask(__name__)
 

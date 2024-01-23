@@ -9,15 +9,11 @@ from flask import (
     render_template,
 )
 
+import config
 from auth import login_required
-from config import get_config
-from datahandler import (
-    do_post_delete,
-    do_post_update,
-    create_new_post
-)
+from datahandler import PostSetter
 
-config = get_config()
+post_setter = PostSetter()
 bp = Blueprint("blog", __name__)
 
 
@@ -35,7 +31,7 @@ def index() -> Response:
     Response
 
     """
-    with open(config["posts_path"], "r") as posts_file:
+    with open(config.posts_path, "r") as posts_file:
         data = json.load(posts_file)
         return render_template(
             "blog/index.html",
@@ -45,7 +41,7 @@ def index() -> Response:
 
 @bp.route("/create", methods=("GET", "POST"))
 @login_required
-def create() -> Response:
+def create_post() -> Response:
     """
     Does validations for post creating process then writes new data by using
     data constructor. Then redirects to index if everything is OK.
@@ -62,7 +58,6 @@ def create() -> Response:
     if request.method == "POST":
 
         title = request.form["title"]
-        body = request.form["body"]
 
         if not title:
             return render_template(
@@ -70,7 +65,7 @@ def create() -> Response:
                 error="Title is required"
             )
 
-        create_new_post(title, body)
+        post_setter.set_post("create", None, title, request.form["body"])
 
         return redirect(url_for("index"))
 
@@ -94,22 +89,17 @@ def update_post(id: str) -> Response:
     Response
 
     """
-    with open(config["posts_path"], "r+") as posts_json:
+    with open(config.posts_path, "r+") as posts_json:
         posts_data = json.load(posts_json)
 
         if request.method == "POST":
 
-            title = request.form["title"]
-            body = request.form["body"]
-
-            if not title:
-                return render_template(
-                    "blog/update.html",
-                    post=posts_data[id],
-                    error="Title is required"
-                )
-
-            do_post_update(posts_data, posts_json, id, title, body)
+            post_setter.set_post(
+                "update",
+                id,
+                request.form["title"],
+                request.form["body"]
+            )
 
             return redirect(url_for("index"))
 
@@ -119,7 +109,7 @@ def update_post(id: str) -> Response:
 
 @bp.route('/<id>/delete', methods=('POST',))
 @login_required
-def delete(id) -> Response:
+def delete_post(id) -> Response:
     """
     Deletes post by id then applies changes to data by using data constructor
 
@@ -132,5 +122,5 @@ def delete(id) -> Response:
     Response
 
     """
-    do_post_delete(id)
+    post_setter.set_post("delete", id, None, None)
     return redirect(url_for('index'))

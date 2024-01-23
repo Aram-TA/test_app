@@ -1,4 +1,3 @@
-import json
 from functools import wraps
 from typing import Callable, Any, NewType
 
@@ -13,10 +12,8 @@ from flask import (
 )
 
 from validator import Validator
-from config import get_config
 from datahandler import save_registered_account
 
-config = get_config()
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 Function = NewType("Function", Any)
 validator = Validator()
@@ -39,9 +36,7 @@ def register() -> Response:
     if request.method == "GET":
         return render_template("auth/register.html")
 
-    error = validator.validate_registration(
-        request.form
-    )
+    error = validator.set_account(request.form, login_mode=False)
     if error:
         return render_template("auth/register.html", error=error)
 
@@ -70,18 +65,15 @@ def login() -> Response:
 
     email = request.form["email"]
 
-    error = validator.validate_login(email, request.form["password"])
+    error, users_data = validator.set_account(request.form, login_mode=True)
 
     if error:
         return render_template("auth/login.html", error=error)
 
-    with open(config["users_path"], "r") as users_file:
-        users = json.load(users_file)
+    session.clear()
 
-        session.clear()
-
-        session["current_user"] = email
-        session["username"] = users[email]["username"]
+    session["current_user"] = email
+    session["username"] = users_data[email]["username"]
 
     return redirect(url_for("index"))
 
