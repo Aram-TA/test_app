@@ -8,5 +8,10 @@
     "phone_number": "+7-77-77-77-77",
     "username": "WeCantFixThat",
     "password": "pbkdf2:sha256:260000$ly90xlxj1H3CDhUC$3e35f4841ae22c589aadcc36f1249f288d2e0f8806a02a152d0d5dbe400983a7"
+  },
+  "hi@lol.com": {
+    "phone_number": "46565465",
+    "username": "hilol",
+    "password": "pbkdf2:sha256:260000$pvsuspl5DLe4rXZ5$9a9fdd828bc6a8cddc1fd4e86c45ba67908fb783090d0111490b8afdc55ea9a6"
   }
 }

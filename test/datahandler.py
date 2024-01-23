@@ -164,7 +164,7 @@ class PostSetter:
         self.posts_json.seek(0)
         self.posts_json.truncate()
 
-        id = 1 if not self.posts_data else max(self.posts_data) + 1
+        id = 1 if not self.posts_data else int(max(self.posts_data)) + 1
 
         self.posts_data[id] = {
             "id": id,
