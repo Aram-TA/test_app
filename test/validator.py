@@ -143,6 +143,7 @@ class Validator:
         self.phone_number: str = self.request_form["phone_number"]
         self.username: str = self.request_form["username"]
         self.password_repeat: str = self.request_form["password_repeat"]
+        self.password: str = self.request_form["password"]
 
         funclist = (
             "email",
