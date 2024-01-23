@@ -36,6 +36,7 @@ def register() -> Response:
         return render_template("auth/register.html")
 
     error = Validator().set_account(request.form, login_mode=False)
+
     if error:
         return render_template("auth/register.html", error=error)
 

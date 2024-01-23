@@ -8,6 +8,13 @@ import config
 
 
 def get_posts_data():
+    """Opens json posts database then returns it for use
+
+    Returns
+    -------
+    dict
+        dict from loaded json database
+    """
     with open(config.posts_path, "r") as posts_file:
         return json.load(posts_file)
 
@@ -56,6 +63,21 @@ class PostSetter:
         title: str | None,
         body: str | None
     ):
+        """Interface that opens necessary files for needed function and does
+        file manipulations. It's created because we don't want to open
+        a lot of copies of the same file inside different functions.
+
+        Parameters
+        ----------
+        action : str
+            Action of interface, we need it to differ what function to call
+        id : str | None
+            id of selected post from posts data
+        title : str | None
+            title of post that user inputted in html form
+        body : str | None
+            body of post that user inputted in html form
+        """
         self.posts_json = open(config.posts_path, "r+")
         self.posts_data = json.load(self.posts_json)
 
@@ -68,7 +90,8 @@ class PostSetter:
 
     def delete_post(self, id: str, title: None, body: None) -> None:
         """
-        Deletes post by id from data
+        Deletes post by id, from database
+
         Parameters
         -----------
         id: str

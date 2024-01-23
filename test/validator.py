@@ -7,6 +7,10 @@ import config
 
 
 class Validator:
+    """
+    Validation class for out inputs from html forms, it takes then validates
+    inputs from routing functions
+    """
     def __init__(self) -> None:
         self.request_form: dict = None
         self.user_data: dict = None
@@ -18,6 +22,23 @@ class Validator:
         self.login_mode: bool = False
 
     def set_account(self, request_form: dict, login_mode: bool):
+        """
+        Interface that opens necessary files for needed function and does
+        selected validation. It's created because we don't want to open
+        a lot of copies of the same file inside different functions
+
+        Parameters
+        ----------
+        request_form : dict
+            dict from html form
+        login_mode : bool
+            differs registration and login
+
+        Returns
+        -------
+        str | None
+
+        """
         with open(config.users_path, "r") as users_data:
             self.user_data = json.load(users_data)
 
@@ -95,18 +116,15 @@ class Validator:
             if self.email not in self.user_data:
                 return "User with that email not found."
 
-    def validate_login(self) -> None | str:
-        """
-        Validates login by using some functions above
-
-        Parameters
-        -----------
-        None
+    def validate_login(self) -> tuple:
+        """Does user login validation by using another validation functions,
+        then if we have error return it inside of tuple with user_data dict
 
         Returns
         -------
-        str | None
-
+        tuple[str | None, dict]
+            tuple that contains error and user data, we need user data
+            for session handling
         """
         self.email: str = self.request_form["email"]
         self.password: str = self.request_form["password"]
@@ -129,6 +147,7 @@ class Validator:
     def validate_registration(self) -> None | str:
         """
         Validates registration by using some functions above
+        If we have some errors in validation we will receive error as string
 
         Parameters
         -----------

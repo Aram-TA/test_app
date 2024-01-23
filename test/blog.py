@@ -38,7 +38,7 @@ def index() -> Response:
 def create_post() -> Response:
     """
     Does validations for post creating process then writes new data by using
-    data constructor. Then redirects to index if everything is OK.
+    PostSetter. Then redirects to index if everything is OK.
 
     Parameters
     -----------
@@ -72,7 +72,7 @@ def create_post() -> Response:
 def update_post(id: str) -> Response:
     """
     Does validations for post updating process then updates data by using
-    data constructor. Then redirects to index if everything is OK.
+    PostSetter. Then redirects to index if everything is OK.
 
     Parameters
     -----------
