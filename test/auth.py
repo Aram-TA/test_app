@@ -8,11 +8,11 @@ from flask import (
     request,
     session,
     url_for,
-    Response
+    Response,
 )
 
 from validator import Validator
-from datahandler import save_registered_account
+from modeling import register_new_account
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 Function = NewType("Function", Any)
@@ -40,7 +40,7 @@ def register() -> Response:
     if error:
         return render_template("auth/register.html", error=error)
 
-    save_registered_account(request.form)
+    register_new_account(request.form)
 
     return redirect(url_for("auth.login"))
 
@@ -98,7 +98,7 @@ def logout() -> Response:
 
 def login_required(view: Function) -> Callable:
     """
-    Decorator that checks is user logged in or not,
+    Decorator that checks is user logged in or not
     if not redirects to login page
 
     Parameters
@@ -110,9 +110,9 @@ def login_required(view: Function) -> Callable:
     Callable
 
     """
+
     @wraps(view)
     def wrapped_view(**kwargs):
-
         if session.get("current_user") is None:
             return redirect(url_for("auth.login"))
 

@@ -11,6 +11,7 @@ class Validator:
     Validation class for out inputs from html forms, it takes then validates
     inputs from routing functions
     """
+
     def __init__(self) -> None:
         self.request_form: dict = None
         self.user_data: dict = None
@@ -62,7 +63,7 @@ class Validator:
         str | None
 
         """
-        if re.match(r'^[\d+\- ]{6,20}$', self.phone_number) is None:
+        if re.match(r"^[\d+\- ]{6,20}$", self.phone_number) is None:
             return """\t\t\tInvalid phone number.
                     Please use right format for phone number."""
 
@@ -84,8 +85,7 @@ class Validator:
 
         if self.login_mode:
             if not check_password_hash(
-                self.user_data[self.email]["password"],
-                self.password
+                self.user_data[self.email]["password"], self.password
             ):
                 return "Incorrect password"
 
@@ -105,11 +105,13 @@ class Validator:
         if not self.email:
             return "Email is required"
 
-        if not self.login_mode and re.match(
-                r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',
-                self.email
-        ) is None:
-
+        if (
+            not self.login_mode
+            and re.match(
+                r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", self.email
+            )
+            is None
+        ):
             return "Invalid email format. Please use correct email format."
 
         if self.login_mode:
@@ -164,12 +166,7 @@ class Validator:
         self.password_repeat: str = self.request_form["password_repeat"]
         self.password: str = self.request_form["password"]
 
-        funclist = (
-            "email",
-            "phone_number",
-            "password_repeat",
-            "password"
-        )
+        funclist = ("email", "phone_number", "password_repeat", "password")
         for func in funclist:
             error = getattr(self, f"validate_{func}")()
 

@@ -1,5 +1,6 @@
 import os
 import json
+
 from flask import Flask
 
 import blog
@@ -20,7 +21,7 @@ if not os.path.exists(config.posts_path):
 app = Flask(__name__)
 
 
-def app_constructor(test_config: dict = None):
+def app_constructor(test_config: dict = {}):
     """
     Creates flasks application object, configures it
 
@@ -36,7 +37,7 @@ def app_constructor(test_config: dict = None):
 
     app.secret_key = "dev"
 
-    if test_config is None:
+    if not test_config:
         app.config.from_pyfile("app_config.py", silent=True)
         # silent = if exists
     else:
@@ -49,4 +50,4 @@ def app_constructor(test_config: dict = None):
 
 if __name__ == "__main__":
     app_constructor()
-    app.run()
+    app.run(debug=True)

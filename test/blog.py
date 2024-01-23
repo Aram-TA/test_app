@@ -8,7 +8,7 @@ from flask import (
 )
 
 from auth import login_required
-from datahandler import PostSetter, get_posts_data
+from modeling import PostController, get_posts_data
 
 bp = Blueprint("blog", __name__)
 
@@ -28,9 +28,9 @@ def index() -> Response:
 
     """
     return render_template(
-            "blog/index.html",
-            posts=get_posts_data(),
-        )
+        "blog/index.html",
+        posts=get_posts_data(),
+    )
 
 
 @bp.route("/create", methods=("GET", "POST"))
@@ -38,7 +38,7 @@ def index() -> Response:
 def create_post() -> Response:
     """
     Does validations for post creating process then writes new data by using
-    PostSetter. Then redirects to index if everything is OK.
+    PostController. Then redirects to index if everything is OK.
 
     Parameters
     -----------
@@ -50,7 +50,6 @@ def create_post() -> Response:
 
     """
     if request.method == "POST":
-
         title = request.form["title"]
 
         if not title:
@@ -59,7 +58,7 @@ def create_post() -> Response:
                 error="Title is required"
             )
 
-        PostSetter().set_post("create", None, title, request.form["body"])
+        PostController().set_post("create", None, title, request.form["body"])
 
         return redirect(url_for("index"))
 
@@ -72,7 +71,7 @@ def create_post() -> Response:
 def update_post(id: str) -> Response:
     """
     Does validations for post updating process then updates data by using
-    PostSetter. Then redirects to index if everything is OK.
+    PostController. Then redirects to index if everything is OK.
 
     Parameters
     -----------
@@ -84,8 +83,7 @@ def update_post(id: str) -> Response:
 
     """
     if request.method == "POST":
-
-        PostSetter().set_post(
+        PostController().set_post(
             "update",
             id,
             request.form["title"],
@@ -98,7 +96,7 @@ def update_post(id: str) -> Response:
         return render_template("blog/update.html", post=get_posts_data()[id])
 
 
-@bp.route('/<id>/delete', methods=('POST',))
+@bp.route("/<id>/delete", methods=("POST",))
 @login_required
 def delete_post(id) -> Response:
     """
@@ -113,5 +111,5 @@ def delete_post(id) -> Response:
     Response
 
     """
-    PostSetter().set_post("delete", id, None, None)
-    return redirect(url_for('index'))
+    PostController().set_post("delete", id, None, None)
+    return redirect(url_for("index"))
