@@ -22,7 +22,7 @@ app = Flask(__name__)
 
 def app_constructor(test_config: dict = None):
     """
-    Creates flasks application object, configures it then runs it
+    Creates flasks application object, configures it
 
     Parameters
     -----------
