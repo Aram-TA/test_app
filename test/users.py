@@ -6,11 +6,21 @@ from werkzeug.security import check_password_hash
 import config
 
 
-class Validator:
+class Users:
     """
     Validation class for out inputs from html forms, it takes then validates
     inputs from routing functions
     """
+    __slots__ = (
+        'request_form',
+        'user_data',
+        'email',
+        'phone_number',
+        'username',
+        'password_repeat',
+        'password',
+        'login_mode'
+    )
 
     def __init__(self) -> None:
         self.request_form: dict = None

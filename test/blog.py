@@ -8,7 +8,7 @@ from flask import (
 )
 
 from auth import login_required
-from modeling import PostController, get_posts_data
+from posts import PostController
 
 bp = Blueprint("blog", __name__)
 
@@ -29,7 +29,7 @@ def index() -> Response:
     """
     return render_template(
         "blog/index.html",
-        posts=get_posts_data(),
+        posts=PostController.get_posts_data(),
     )
 
 
@@ -93,7 +93,10 @@ def update_post(id: str) -> Response:
         return redirect(url_for("index"))
 
     else:
-        return render_template("blog/update.html", post=get_posts_data()[id])
+        return render_template(
+            "blog/update.html",
+            post=PostController.get_posts_data()[id]
+        )
 
 
 @bp.route("/<id>/delete", methods=("POST",))

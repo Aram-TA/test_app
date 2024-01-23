@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Callable, Any, NewType
+from typing import Callable
 
 from flask import (
     render_template,
@@ -11,11 +11,10 @@ from flask import (
     Response,
 )
 
-from validator import Validator
-from modeling import register_new_account
+from users import Users
+from posts import register_new_account
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
-Function = NewType("Function", Any)
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -35,7 +34,7 @@ def register() -> Response:
     if request.method == "GET":
         return render_template("auth/register.html")
 
-    error = Validator().set_account(request.form, login_mode=False)
+    error = Users().set_account(request.form, login_mode=False)
 
     if error:
         return render_template("auth/register.html", error=error)
@@ -65,7 +64,7 @@ def login() -> Response:
 
     email = request.form["email"]
 
-    error, users_data = Validator().set_account(request.form, login_mode=True)
+    error, users_data = Users().set_account(request.form, login_mode=True)
 
     if error:
         return render_template("auth/login.html", error=error)
@@ -96,7 +95,7 @@ def logout() -> Response:
     return redirect(url_for("index"))
 
 
-def login_required(view: Function) -> Callable:
+def login_required(view: Callable) -> Callable:
     """
     Decorator that checks is user logged in or not
     if not redirects to login page

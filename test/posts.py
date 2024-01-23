@@ -7,18 +7,6 @@ from werkzeug.security import generate_password_hash
 import config
 
 
-def get_posts_data():
-    """Opens json posts database then returns it for use
-
-    Returns
-    -------
-    dict
-        dict from loaded json database
-    """
-    with open(config.posts_path, "r") as posts_file:
-        return json.load(posts_file)
-
-
 def register_new_account(request_form: dict) -> None:
     """
     Loads data from database and after inserts new values there
@@ -51,12 +39,22 @@ def register_new_account(request_form: dict) -> None:
 
 
 class PostController:
-    def __init__(self):
-        self.posts_json = None
-        self.posts_data: dict = None
+    @staticmethod
+    def get_posts_data():
+        """Opens json posts database then returns it for use
+
+        Returns
+        -------
+        dict
+            dict from loaded json database
+        """
+        with open(config.posts_path, "r") as posts_file:
+            return json.load(posts_file)
 
     def set_post(
-        self, action: str, id: str | None, title: str | None, body: str | None
+        self,
+        action: str,
+        id: str | None, title: str | None, body: str | None
     ):
         """Interface that opens necessary files for needed function and does
         file manipulations. It's created because we don't want to open
@@ -73,15 +71,21 @@ class PostController:
         body : str | None
             body of post that user inputted in html form
         """
-        self.posts_json = open(config.posts_path, "r+")
-        self.posts_data = json.load(self.posts_json)
+        with open(config.posts_path, "r+") as posts_json:
+            posts_data = json.load(posts_json)
 
-        getattr(self, f"{action}_post")(id, title, body)
+            getattr(self, f"{action}_post")(
+                posts_data=posts_data,
+                posts_json=posts_json,
+                id=id,
+                title=title,
+                body=body
+            )
 
-    def delete_post(self, id: str, title: None, body: None) -> None:
+    @staticmethod
+    def delete_post(**kwargs) -> None:
         """
         Deletes post by id, from database
-
         Parameters
         -----------
         id: str
@@ -93,14 +97,14 @@ class PostController:
         None
 
         """
-        self.posts_json.seek(0)
+        kwargs['posts_json'].seek(0)
 
-        del self.posts_data[id]
+        del kwargs['posts_data'][id]
 
-        json.dump(self.posts_data, self.posts_json, indent=2)
-        self.posts_json.close()
+        json.dump(kwargs['posts_data'], kwargs['posts_json'], indent=2)
 
-    def update_post(self, id: str, title: str, body: str = "") -> None:
+    @staticmethod
+    def update_post(**kwargs) -> None:
         """
         Updates post and saves new updated data
 
@@ -115,21 +119,21 @@ class PostController:
         None
 
         """
-        self.posts_json.seek(0)
+        kwargs['posts_json'].seek(0)
 
-        self.posts_data[id] = {
+        kwargs['posts_data'][id] = {
             "id": id,
-            "title": title,
-            "body": body,
+            "title": kwargs['title'],
+            "body": kwargs['body'],
             "author": session["username"],
             "author_email": session["current_user"],
             "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
 
-        json.dump(self.posts_data, self.posts_json, indent=2)
-        self.posts_json.close()
+        json.dump(kwargs['posts_data'], kwargs['posts_json'], indent=2)
 
-    def create_post(self, id: None, title: str, body: str = "") -> None:
+    @staticmethod
+    def create_post(**kwargs) -> None:
         """
         Creates post and saves it's data
 
@@ -145,17 +149,17 @@ class PostController:
 
         """
 
-        self.posts_json.seek(0)
+        kwargs['posts_json'].seek(0)
 
-        id = 1 if not self.posts_data else int(max(self.posts_data)) + 1
+        id = 1 if not kwargs['posts_data'] else int(max(
+            kwargs['posts_data'])) + 1
 
-        self.posts_data[id] = {
+        kwargs['posts_data'][id] = {
             "id": id,
-            "title": title,
-            "body": body,
+            "title": kwargs['title'],
+            "body": kwargs['body'],
             "author": session["username"],
             "author_email": session["current_user"],
             "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
-        json.dump(self.posts_data, self.posts_json, indent=2)
-        self.posts_json.close()
+        json.dump(kwargs['posts_data'], kwargs['posts_json'], indent=2)

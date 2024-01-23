@@ -1,11 +1,11 @@
 import os
 import json
-
 from flask import Flask
 
 import blog
 import auth
 import config
+
 
 if not os.path.exists("data"):
     os.mkdir("data")
