@@ -2,40 +2,8 @@ import json
 from datetime import datetime
 
 from flask import session
-from werkzeug.security import generate_password_hash
 
 import config
-
-
-def register_new_account(request_form: dict) -> None:
-    """
-    Loads data from database and after inserts new values there
-
-    Parameters
-    -----------
-    email: str
-    phone_number: str
-    username: str
-    password: str
-    password_repeat: str
-
-    Returns
-    -------
-    None
-
-    """
-    with open(config.users_path, "r+") as users_json:
-        data = json.load(users_json)
-
-        users_json.seek(0)
-
-        data[request_form["email"]] = {
-            "phone_number": request_form["phone_number"],
-            "username": request_form["username"],
-            "password": generate_password_hash(request_form["password"]),
-        }
-
-        json.dump(data, users_json, indent=2)
 
 
 class PostController:

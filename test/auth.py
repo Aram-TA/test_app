@@ -12,7 +12,6 @@ from flask import (
 )
 
 from users import Users
-from posts import register_new_account
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -39,7 +38,7 @@ def register() -> Response:
     if error:
         return render_template("auth/register.html", error=error)
 
-    register_new_account(request.form)
+    Users.register_new_account(request.form)
 
     return redirect(url_for("auth.login"))
 
