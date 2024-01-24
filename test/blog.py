@@ -29,7 +29,7 @@ def index() -> Response:
     """
     return render_template(
         "blog/index.html",
-        posts=PostController.get_posts_data(),
+        posts=PostController().get_posts_data(),
     )
 
 
@@ -94,7 +94,7 @@ def update_post(post_id: str) -> Response:
     else:
         return render_template(
             "blog/update.html",
-            post=PostController.get_posts_data()[post_id]
+            post=PostController().get_posts_data()[post_id]
         )
 
 

@@ -7,7 +7,7 @@ import config
 
 
 class PostController:
-    __slots__ = "users_path",
+    __slots__ = "posts_path",
 
     def __init__(self) -> None:
         self.posts_path = config.posts_path
