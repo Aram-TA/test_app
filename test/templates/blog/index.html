@@ -8,20 +8,20 @@
 {% endblock %}
 
 {% block content %}
-{% for id in posts %}
+{% for post_id in posts %}
 <article class="post">
   <header>
     <div>
-      <h1>{{ posts[id]['title'] }}</h1>
-      <div class="about">by {{ posts[id]['author'] }} on {{ posts[id]['created'] }}</div>
+      <h1>{{ posts[post_id]['title'] }}</h1>
+      <div class="about">by {{ posts[post_id]['author'] }} on {{ posts[post_id]['created'] }}</div>
     </div>
-    {% if session.get("current_user", None) == posts[id]['author_email'] %}
-    <a class="action" href="{{ url_for('blog.update_post', id=id) }}">
+    {% if session.get("current_user", None) == posts[post_id]['author_email'] %}
+    <a class="action" href="{{ url_for('blog.update_post', post_id=post_id) }}">
       Edit
     </a>
     {% endif %}
   </header>
-  <p class="body">{{ posts[id]['body'] }}</p>
+  <p class="body">{{ posts[post_id]['body'] }}</p>
 </article>
 {% if not loop.last %}
 <hr>

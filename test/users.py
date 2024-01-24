@@ -64,7 +64,10 @@ class Users:
         with open(self.users_path, "r") as users_json:
             user_data = json.load(users_json)
 
-        return getattr(self, f"validate_{mode}")(request_form, user_data)
+        return getattr(self, f"validate_{mode}")(
+            request_form=request_form,
+            user_data=user_data
+        )
 
     def validate_phone_number(self, phone_number: str) -> None | str:
         """
@@ -130,11 +133,11 @@ class Users:
             user_data[email]["password"],
             request_form["password"]
         ):
-            error = "Incorrect password", user_data
+            error = "Incorrect password"
 
         return error, user_data
 
-    def validate_registration(self, request_form: dict) -> None | str:
+    def validate_registration(self, **kwargs) -> None | str:
         """
         Validates registration by using some functions above
         If we have some errors in validation we will receive error as string
@@ -148,11 +151,15 @@ class Users:
         str | None
 
         """
-        if request_form['password'] != request_form['password_repeat']:
+        if kwargs['request_form']['password'] != kwargs[
+                'request_form']['password_repeat']:
             return "Passwords in both fields should be same."
 
         for func in ("email", "phone_number", "password"):
-            error = getattr(self, f"validate_{func}")(request_form[func])
+
+            error = getattr(self, f"validate_{func}")(
+                kwargs['request_form'][func]
+            )
 
             if error:
                 return error

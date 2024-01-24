@@ -33,12 +33,12 @@ def register() -> Response:
     if request.method == "GET":
         return render_template("auth/register.html")
 
-    error = Users().set_account(request.form, login_mode=False)
+    error = Users().set_account(request.form, mode="registration")
 
     if error:
         return render_template("auth/register.html", error=error)
 
-    Users.register_new_account(request.form)
+    Users().register_new_account(request.form)
 
     return redirect(url_for("auth.login"))
 
@@ -63,8 +63,9 @@ def login() -> Response:
 
     email = request.form["email"]
 
-    error, users_data = Users().set_account(request.form, login_mode=True)
-
+    error, users_data = Users().set_account(request.form, mode="login")
+    # print(error)
+    print(users_data)
     if error:
         return render_template("auth/login.html", error=error)
 

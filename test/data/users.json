@@ -1,12 +1,1 @@
-{
-  "lol@kek.com": {
-    "phone_number": "121232313",
-    "username": "qwerty",
-    "password": "pbkdf2:sha256:260000$TnupDuXZaPVKYkvW$71ac349b0dd7032c3e24146362b4b49849ead601eda710c01063ef78e6d7cc80"
-  },
-  "hi@lol.com": {
-    "phone_number": "34324234",
-    "username": "qwertyu",
-    "password": "pbkdf2:sha256:260000$RoFPr8fJpZlzbA1n$fc3129f3d4340de6f2dd784191e468499dba91c28038a089251dc14d78bc293b"
-  }
-}
+{}

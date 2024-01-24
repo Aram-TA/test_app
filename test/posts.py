@@ -22,7 +22,7 @@ class PostController:
     def set_post(
         self,
         action: str,
-        id: str | None,
+        post_id: str | None,
         title: str | None,
         body: str | None
     ):
@@ -33,13 +33,10 @@ class PostController:
         Parameters
         ----------
         action : str
-            Action of interface, we need it to differ what function to call
-        id : str | None
-            id of selected post from posts data
+        post_id : str | None
         title : str | None
-            title of post that user inputted in html form
         body : str | None
-            body of post that user inputted in html form
+
         """
         with open(config.posts_path, "r+") as posts_json:
             posts_data = json.load(posts_json)
@@ -47,52 +44,28 @@ class PostController:
             getattr(self, f"{action}_post")(
                 posts_data=posts_data,
                 posts_json=posts_json,
-                id=id,
+                post_id=post_id,
                 title=title,
                 body=body
             )
 
     @staticmethod
     def delete_post(**kwargs) -> None:
-        """
-        Deletes post by id, from database
-        Parameters
-        -----------
-        id: str
-        title: None
-        body: None
 
-        Returns
-        -------
-        None
-
-        """
         kwargs['posts_json'].seek(0)
+        kwargs['posts_json'].truncate()
 
-        del kwargs['posts_data'][id]
+        del kwargs['posts_data'][kwargs['post_id']]
 
         json.dump(kwargs['posts_data'], kwargs['posts_json'], indent=2)
 
     @staticmethod
     def update_post(**kwargs) -> None:
-        """
-        Updates post and saves new updated data
 
-        Parameters
-        -----------
-        id: str
-        title: str
-        body: str
-
-        Returns
-        -------
-        None
-
-        """
         kwargs['posts_json'].seek(0)
 
-        kwargs['posts_data'][id] = {
-            "id": id,
+        kwargs['posts_data'][kwargs['post_id']] = {
+            "post_id": kwargs['post_id'],
             "title": kwargs['title'],
             "body": kwargs['body'],
             "author": session["username"],
@@ -104,28 +77,14 @@ class PostController:
 
     @staticmethod
     def create_post(**kwargs) -> None:
-        """
-        Creates post and saves it's data
-
-        Parameters
-        -----------
-        id: None
-        title: str
-        body: str
-
-        Returns
-        -------
-        None
-
-        """
 
         kwargs['posts_json'].seek(0)
 
-        id = 1 if not kwargs['posts_data'] else int(max(
+        post_id = 1 if not kwargs['posts_data'] else int(max(
             kwargs['posts_data'])) + 1
 
-        kwargs['posts_data'][id] = {
-            "id": id,
+        kwargs['posts_data'][post_id] = {
+            "post_id": post_id,
             "title": kwargs['title'],
             "body": kwargs['body'],
             "author": session["username"],

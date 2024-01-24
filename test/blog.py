@@ -66,16 +66,16 @@ def create_post() -> Response:
         return render_template("blog/create.html")
 
 
-@bp.route("/<id>/update", methods=("GET", "POST"))
+@bp.route("/<post_id>/update", methods=("GET", "POST"))
 @login_required
-def update_post(id: str) -> Response:
+def update_post(post_id: str) -> Response:
     """
     Does validations for post updating process then updates data by using
     PostController. Then redirects to index if everything is OK.
 
     Parameters
     -----------
-    id: str
+    post_id: str
 
     Returns
     -------
@@ -85,7 +85,7 @@ def update_post(id: str) -> Response:
     if request.method == "POST":
         PostController().set_post(
             "update",
-            id,
+            post_id,
             request.form["title"],
             request.form["body"]
         )
@@ -95,24 +95,24 @@ def update_post(id: str) -> Response:
     else:
         return render_template(
             "blog/update.html",
-            post=PostController.get_posts_data()[id]
+            post=PostController.get_posts_data()[post_id]
         )
 
 
-@bp.route("/<id>/delete", methods=("POST",))
+@bp.route("/<post_id>/delete", methods=("POST",))
 @login_required
-def delete_post(id) -> Response:
+def delete_post(post_id: str) -> Response:
     """
-    Deletes post by id then applies changes to data by using data constructor
+    Deletes post by post_id then applies changes to data
 
     Parameters
     -----------
-    id: str
+    post_id: str
 
     Returns
     -------
     Response
 
     """
-    PostController().set_post("delete", id, None, None)
+    PostController().set_post("delete", post_id, None, None)
     return redirect(url_for("index"))
