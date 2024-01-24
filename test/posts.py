@@ -7,8 +7,12 @@ import config
 
 
 class PostController:
-    @staticmethod
-    def get_posts_data():
+    __slots__ = "users_path",
+
+    def __init__(self) -> None:
+        self.posts_path = config.posts_path
+
+    def get_posts_data(self):
         """Opens json posts database then returns it for use
 
         Returns
@@ -16,7 +20,7 @@ class PostController:
         dict
             dict from loaded json database
         """
-        with open(config.posts_path, "r") as posts_file:
+        with open(self.posts_path, "r") as posts_file:
             return json.load(posts_file)
 
     def set_post(
@@ -38,7 +42,7 @@ class PostController:
         body : str | None
 
         """
-        with open(config.posts_path, "r+") as posts_json:
+        with open(self.posts_path, "r+") as posts_json:
             posts_data = json.load(posts_json)
 
             getattr(self, f"{action}_post")(
