@@ -102,7 +102,7 @@ def login_required(view: Callable) -> Callable:
 
     Parameters
     -----------
-    view: function
+    view: Callable
 
     Returns
     -------
@@ -112,7 +112,7 @@ def login_required(view: Callable) -> Callable:
 
     @wraps(view)
     def wrapped_view(**kwargs):
-        if session.get("current_user") is None:
+        if not session.get("current_user"):
             return redirect(url_for("auth.login"))
 
         return view(**kwargs)

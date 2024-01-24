@@ -8,7 +8,7 @@ from flask import (
 )
 
 from auth import login_required
-from posts import PostController
+from notes import PostController
 
 bp = Blueprint("blog", __name__)
 
@@ -70,8 +70,7 @@ def create_post() -> Response:
 @login_required
 def update_post(post_id: str) -> Response:
     """
-    Does validations for post updating process then updates data by using
-    PostController. Then redirects to index if everything is OK.
+    Updates post by post_id by using PostController
 
     Parameters
     -----------
@@ -103,7 +102,7 @@ def update_post(post_id: str) -> Response:
 @login_required
 def delete_post(post_id: str) -> Response:
     """
-    Deletes post by post_id then applies changes to data
+    Deletes post by post_id
 
     Parameters
     -----------

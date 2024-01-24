@@ -13,12 +13,13 @@ class PostController:
         self.posts_path = config.posts_path
 
     def get_posts_data(self):
-        """Opens json posts database then returns it for use
+        """
+        Opens posts json and returns it's loaded data
 
         Returns
         -------
         dict
-            dict from loaded json database
+
         """
         with open(self.posts_path, "r") as posts_file:
             return json.load(posts_file)
@@ -30,7 +31,8 @@ class PostController:
         title: str | None,
         body: str | None
     ):
-        """Interface that opens necessary files for needed function and does
+        """
+        Interface that opens necessary files for needed function and does
         file manipulations. It's created because we don't want to open
         a lot of copies of the same file inside different functions.
 
@@ -53,41 +55,52 @@ class PostController:
                 body=body
             )
 
-    @staticmethod
-    def delete_post(**kwargs) -> None:
+    def delete_post(self, **kwargs) -> None:
+        """
+        Deletes post by id from database
+        """
+        posts_json = kwargs['posts_json']
+        posts_data = kwargs['posts_data']
 
-        kwargs['posts_json'].seek(0)
-        kwargs['posts_json'].truncate()
+        posts_json.seek(0)
+        posts_json.truncate()
 
-        del kwargs['posts_data'][kwargs['post_id']]
+        del posts_data[kwargs['post_id']]
 
-        json.dump(kwargs['posts_data'], kwargs['posts_json'], indent=2)
+        json.dump(posts_data, posts_json, indent=2)
 
-    @staticmethod
-    def update_post(**kwargs) -> None:
+    def update_post(self, **kwargs) -> None:
+        """
+        Updates posts_data dict then saves new data
+        """
+        posts_json = kwargs['posts_json']
+        posts_data = kwargs["posts_data"]
 
-        kwargs['posts_json'].seek(0)
+        posts_json.seek(0)
 
-        kwargs['posts_data'][kwargs['post_id']] = {
-            "post_id": kwargs['post_id'],
+        posts_data[kwargs['post_id']].update({
             "title": kwargs['title'],
             "body": kwargs['body'],
-            "author": session["username"],
-            "author_email": session["current_user"],
-            "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        }
+            "updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
 
-        json.dump(kwargs['posts_data'], kwargs['posts_json'], indent=2)
+        json.dump(posts_data, posts_json, indent=2)
 
-    @staticmethod
-    def create_post(**kwargs) -> None:
+    def create_post(self, **kwargs) -> None:
+        """
+        Creates new key value pair where value have all necessary data
+        about post then saves it to database
+        """
+        posts_json = kwargs['posts_json']
+        posts_data = kwargs["posts_data"]
+        post_id = kwargs['post_id']
 
-        kwargs['posts_json'].seek(0)
+        posts_json.seek(0)
 
-        post_id = 1 if not kwargs['posts_data'] else int(max(
-            kwargs['posts_data'])) + 1
+        post_id = 1 if not posts_data else int(max(
+            posts_data)) + 1
 
-        kwargs['posts_data'][post_id] = {
+        posts_data[post_id] = {
             "post_id": post_id,
             "title": kwargs['title'],
             "body": kwargs['body'],
@@ -95,4 +108,4 @@ class PostController:
             "author_email": session["current_user"],
             "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
-        json.dump(kwargs['posts_data'], kwargs['posts_json'], indent=2)
+        json.dump(posts_data, posts_json, indent=2)

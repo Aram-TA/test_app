@@ -21,29 +21,21 @@ class Users:
 
         Parameters
         -----------
-        email: str
-        phone_number: str
-        username: str
-        password: str
-        password_repeat: str
-
-        Returns
-        -------
-        None
+        request_form : dict
 
         """
         with open(self.users_path, "r+") as users_json:
-            data = json.load(users_json)
+            users_data = json.load(users_json)
 
             users_json.seek(0)
 
-            data[request_form["email"]] = {
+            users_data[request_form["email"]] = {
                 "phone_number": request_form["phone_number"],
                 "username": request_form["username"],
                 "password": generate_password_hash(request_form["password"]),
             }
 
-            json.dump(data, users_json, indent=2)
+            json.dump(users_data, users_json, indent=2)
 
     def set_account(self, request_form: dict, mode: str):
         """
@@ -103,6 +95,18 @@ class Users:
             return "Password is required."
 
     def validate_email(self, email: str) -> None | str:
+        """
+        Validates email by using regex.
+
+        Parameters
+        ----------
+        email : str
+
+        Returns
+        -------
+        None | str
+
+        """
 
         if not re.match(
                 r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
@@ -111,7 +115,9 @@ class Users:
             return "Invalid email format. Please use correct email format."
 
     def validate_login(self, request_form: dict, user_data: dict) -> tuple:
-        """Validates user login by using existing password and email
+        """
+        Validates user login by using existing password and email.
+        Also gives back user data for use to routing function
 
         Parameters
         ----------
@@ -121,7 +127,7 @@ class Users:
         Returns
         -------
         tuple
-            Contains error end user data for further use in handler
+
         """
         error = None
         email = request_form["email"]
@@ -142,24 +148,20 @@ class Users:
         Validates registration by using some functions above
         If we have some errors in validation we will receive error as string
 
-        Parameters
-        -----------
-        request_form : dict
-
         Returns
         -------
         str | None
 
         """
-        if kwargs['request_form']['password'] != kwargs[
-                'request_form']['password_repeat']:
+        request_form = kwargs['request_form']
+
+        if request_form['password'] !=\
+                request_form['password_repeat']:
             return "Passwords in both fields should be same."
 
-        for func in ("email", "phone_number", "password"):
+        for input_type in ("email", "phone_number", "password"):
 
-            error = getattr(self, f"validate_{func}")(
-                kwargs['request_form'][func]
-            )
-
-            if error:
+            if error := getattr(self, f"validate_{input_type}")(
+                request_form[input_type]
+            ):
                 return error
