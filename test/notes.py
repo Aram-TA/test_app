@@ -101,7 +101,7 @@ class PostController:
             posts_data)) + 1
 
         posts_data[post_id] = {
-            "post_id": post_id,
+            "post_id": post_id,  # Can't handle delete without this guy
             "title": kwargs['title'],
             "body": kwargs['body'],
             "author": session["username"],

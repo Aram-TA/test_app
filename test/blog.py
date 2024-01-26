@@ -94,11 +94,12 @@ def update_post(post_id: str) -> Response:
     else:
         return render_template(
             "blog/update.html",
-            post=PostController().get_posts_data()[post_id]
+            post=PostController().get_posts_data()[post_id],
+            post_id=post_id
         )
 
 
-@bp.route("/<post_id>/delete", methods=("POST",))
+@bp.route("/delete/<post_id>", methods=("POST",))
 @login_required
 def delete_post(post_id: str) -> Response:
     """
