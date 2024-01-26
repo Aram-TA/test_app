@@ -1,4 +1,5 @@
 <!doctype html>
+
 <head>
   <title>{% block title %}{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
@@ -6,7 +7,7 @@
 
 <body>
   <header>
-    <nav id="nav_container">
+    <nav class="nav_container">
       <h1 id="nav_header">Posting test app</h1>
       <ul class="nav_list">
         {% if session.get("current_user", None) %}
@@ -19,15 +20,15 @@
       </ul>
     </nav>
   </header>
-  <main class="content">
-    <section style="display: flex;">
-      {% block header %}{% endblock %}
+  <main>
+    <section class="main_content">
+      <article>
+        {% block header %}{% endblock %}
+      </article>
+      <article>
+        {% block content %}{% endblock %}
+      </article>
     </section>
-    <hr>
-    {% for message in get_flashed_messages() %}
-    <section class="flash">{{ message }}</section>
-    {% endfor %}
-    {% block content %}{% endblock %}
   </main>
   <footer></footer>
 </body>

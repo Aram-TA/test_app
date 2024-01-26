@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1 id="posts_header">{% block title %}All Posts{% endblock %}</h1>
+<h3 style="margin-top: 0; padding-top: 15px;">{% block title %}All Posts{% endblock %}</h3>
 {% if session.get("username", None) %}
 <a id="new_post" href="{{ url_for('blog.create_post') }}">New</a>
 {% endif %}
@@ -13,7 +13,7 @@
 <section id="post">
   {% for post_id in posts %}
     <article class="post_title">
-      <h1>{{ posts[post_id]['title'] }}</h1>
+      <h3>{{ posts[post_id]['title'] }}</h3>
       <p class="about">
         by <span class="underlined">{{ posts[post_id]['author'] }}</span> on {{ posts[post_id]['created'] }}
       </p>
@@ -23,7 +23,6 @@
     </a>
     {% endif %}
     </article>
-    <hr>
     <p class="body">{{ posts[post_id]['body'] }}</p>
   {% if not loop.last %}
   <hr>
