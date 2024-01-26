@@ -66,7 +66,7 @@ def create_post() -> Response:
         return render_template("blog/create.html")
 
 
-@bp.route("/<post_id>/update", methods=("GET", "POST"))
+@bp.route("/update/<post_id>", methods=("GET", "POST"))
 @login_required
 def update_post(post_id: str) -> Response:
     """
