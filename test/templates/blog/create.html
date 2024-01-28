@@ -1,18 +1,35 @@
-{% extends 'base.html' %}
+<!doctype html>
+<html lang="en">
 
-{% block header %}
-<h1>{% block title %}New Post{% endblock %}</h1>
-{% if error %}
-<p>{{ error }}</p>
-{% endif %}
-{% endblock %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Post</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='create.css') }}">
+</head>
 
-{% block content %}
-<form method="post">
-  <label for="title">Title</label>
-  <input name="title" id="title" value="{{ request.form['title'] }}" required>
-  <label for="body">Body</label>
-  <textarea name="body" id="body">{{ request.form['body'] }}</textarea>
-  <input type="submit" value="Save">
-</form>
-{% endblock %}
+<body>
+  <header>
+    <h1>New post</h1>
+  </header>
+  <main>
+    <article class="main_content">
+      <section>
+        {% if error %}
+        <p>{{ error }}</p>
+        {% endif %}
+        <form method="post">
+          <label for="title">Title</label>
+          <input name="title" id="title" value="{{ request.form['title'] }}" required>
+          <label for="body">Body</label>
+          <textarea name="body" id="body">{{ request.form['body'] }}</textarea>
+          <input type="submit" value="Save">
+        </form>
+      </section>
+    </article>
+  </main>
+
+  <footer></footer>
+</body>
+
+</html>

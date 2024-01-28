@@ -1,24 +1,50 @@
-{% extends 'base.html' %}
+<!doctype html>
+<html lang="en">
 
-{% block header %}
-<h1>{% block title %}Register{% endblock %}</h1>
-{% if error %}
-<p>{{ error }}</p>
-{% endif %}
-{% endblock %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+</head>
 
-{% block content %}
-<form method="post">
-  <label for="email">Email</label>
-  <input name="email" id="email" required>
-  <label for="phone_number">Phone number</label>
-  <input name="phone_number" id="phone_number" required>
-  <label for="username">Username</label>
-  <input name="username" id="username" required>
-  <label for="password">Password</label>
-  <input type="password" name="password" id="password" required>
-  <label for="password_repeat">Repeat password</label>
-  <input type="password" name="password_repeat" id="password_repeat" required>
-  <input type="submit" value="Register">
-</form>
-{% endblock %}
+<body>
+  <header>
+    <nav class="nav_container">
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="templates/about_us.html">About Us</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="main_content">
+      <section class="form_container">
+        {% if error %}
+        <p class="error_massage">{{ error }}</p>
+        {% endif %}
+        <p>Register</p>
+        <form method="post" class="reg_form">
+          <label for="email">Email</label>
+          <input name="email" id="email" required>
+          <label for="phone_number">Phone number</label>
+          <input name="phone_number" id="phone_number" required>
+          <label for="username">Username</label>
+          <input name="username" id="username" required>
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" required>
+          <label for="password_repeat">Repeat password</label>
+          <input type="password" name="password_repeat" id="password_repeat" required>
+          <input type="submit" value="Register">
+        </form>
+        <p>
+          Already have an account?<br>
+          <a href="{{ url_for('auth.login') }}">Log In</a>
+        </p>
+      </section>
+    </article>
+  </main>
+
+  <footer></footer>
+</body>
+
+</html>

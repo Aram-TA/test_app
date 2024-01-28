@@ -1,32 +1,81 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block header %}
-<h3 style="margin-top: 0; padding-top: 15px;">{% block title %}All Posts{% endblock %}</h3>
-{% if session.get("username", None) %}
-<a id="new_post" href="{{ url_for('blog.create_post') }}">New</a>
-{% endif %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
+</head>
 
-{% endblock %}
+<body>
+  <header>
+    <nav class="nav_container">
+      <h1 class="nav_header">Some random forum</h1>
+      <ul class="nav_list">
+        {% if session.get("current_user", None) %}
+        <li class="nav_items">
+          <span>{{ session["username"] }}</span>
+        </li>
+        <li class="nav_items">
+          <a href="{{ url_for('auth.logout') }}">Log Out</a>
+        </li>
+        {% else %}
 
+        <li class="nav_items">
+          <a href="{{ url_for('auth.register') }}">Register</a>
+        </li>
+        <li class="nav_items">
+          <a href="{{ url_for('auth.login') }}">Log In</a>
+          {% endif %}
+        </li>
+      </ul>
+    </nav>
+  </header>
 
-{% block content %}
-<section id="post">
-  {% for post_id in posts %}
-    <article class="post_title">
-      <h3>{{ posts[post_id]['title'] }}</h3>
-      <p class="about">
-        by <span class="underlined">{{ posts[post_id]['author'] }}</span> on {{ posts[post_id]['created'] }}
-      </p>
-      {% if session.get("current_user", None) == posts[post_id]['author_email'] %}
-    <a class="action" href="{{ url_for('blog.update_post', post_id=post_id) }}">
-      Edit
-    </a>
-    {% endif %}
+  <main>
+    <article class="main_content">
+
+      <section class="post_header">
+        <h3>All messages</h3>
+        {% if session.get("username", None) %}
+        <p><a id="new_post" href="{{ url_for('blog.create_post') }}">New Message</a></p>
+        {% endif %}
+      </section>
+
+      <section class="full_posts">
+        {% for post_id in posts %}
+        <div class="post_title">
+          <ul class="title_list">
+            <li>
+              <p class="about">
+                Message by
+                <span class="underlined">{{ posts[post_id]['author'] }}</span>
+                on {{ posts[post_id]['created'] }}
+              </p>
+            </li>
+            <li>
+              <h3>{{ posts[post_id]['title'] }}</h3>
+            </li>
+          </ul>
+
+          {% if session.get("current_user", None) ==
+          posts[post_id]['author_email'] %}
+          <p class="action"><a href="{{ url_for('blog.update_post', post_id=post_id) }}">Edit</a></p>
+        </div>
+        {% endif %}
+        {% if posts[post_id]["body"] %}
+        <p style="margin: 0px; font-style: italic; padding-left: 7px;">Text</p>
+        <p class="post_message">{{ posts[post_id]['body'] }}</p>
+        {% endif %}
+        {% endfor %}
+      </section>
     </article>
-    <p class="body">{{ posts[post_id]['body'] }}</p>
-  {% if not loop.last %}
-  <hr>
-</section>
-{% endif %}
-{% endfor %}
-{% endblock %}
+  </main>
+
+  <footer>
+
+  </footer>
+</body>
+
+</html>
