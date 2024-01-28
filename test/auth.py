@@ -64,8 +64,6 @@ def login() -> Response:
     email = request.form["email"]
 
     error, users_data = Users().set_account(request.form, mode="login")
-    # print(error)
-    print(users_data)
     if error:
         return render_template("auth/login.html", error=error)
 
