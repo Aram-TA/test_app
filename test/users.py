@@ -1,5 +1,6 @@
 import re
 import json
+from string import ascii_lowercase, ascii_uppercase, digits
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -37,7 +38,7 @@ class Users:
 
             json.dump(users_data, users_json, indent=2)
 
-    def set_account(self, request_form: dict, mode: str):
+    def set_account(self, request_form: dict, mode: str) -> tuple | str | None:
         """
         Interface that opens necessary files for needed function and does
         selected validation. It's created because we don't want to open
@@ -74,9 +75,12 @@ class Users:
         str | None
 
         """
-        if not re.match(r"^[\d+\- ]{6,20}$", phone_number):
-            return """\t\t\tInvalid phone number.
-                    Please use right format for phone number."""
+        if not (
+            phone_number.replace("-", "").replace(
+                " ", "").replace("+", "").isdigit()
+            and len(phone_number) <= 30 and len(phone_number) <= 6
+        ):
+            return "Invalid phone number format."
 
     def validate_password(self, password: str) -> None | str:
         """
@@ -94,6 +98,20 @@ class Users:
         if not password:
             return "Password is required."
 
+        have_digit, have_lowercase, have_uppercase = False, False, False
+
+        for char in password:
+            if char in ascii_lowercase:
+                have_lowercase = True
+            elif char in ascii_uppercase:
+                have_uppercase = True
+            elif char in digits:
+                have_digit = True
+
+        if not all((have_lowercase, have_uppercase, have_digit)):
+            return """Password should contain at least 1 digit,
+            1 uppercase and 1 lowercase letters."""
+
     def validate_email(self, email: str) -> None | str:
         """
         Validates email by using regex.
@@ -109,7 +127,7 @@ class Users:
         """
 
         if not re.match(
-                r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
+                r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]{1,30}$",
                 email
         ):
             return "Invalid email format. Please use correct email format."
@@ -132,14 +150,12 @@ class Users:
         error = None
         email = request_form["email"]
 
-        if email not in user_data:
-            return "User with that email not found.", user_data
-
         if not check_password_hash(
             user_data[email]["password"],
             request_form["password"]
-        ):
-            error = "Incorrect password"
+        ) or email not in user_data:
+
+            error = "User with that email not found or Incorrect password"
 
         return error, user_data
 

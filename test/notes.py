@@ -6,13 +6,13 @@ from flask import session
 import config
 
 
-class PostController:
+class NotesController:
     __slots__ = "posts_path",
 
     def __init__(self) -> None:
         self.posts_path = config.posts_path
 
-    def get_posts_data(self):
+    def get_posts_data(self) -> dict:
         """
         Opens posts json and returns it's loaded data
 
@@ -30,7 +30,7 @@ class PostController:
         post_id: str | None,
         title: str | None,
         body: str | None
-    ):
+    ) -> None:
         """
         Interface that opens necessary files for needed function and does
         file manipulations. It's created because we don't want to open

@@ -16,7 +16,20 @@ from users import Users
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-@bp.route("/register", methods=("GET", "POST"))
+@bp.route("/register", methods=("GET"))
+def get_register() -> Response:
+    """
+    Renders register template
+
+    Returns
+    -------
+    Response
+
+    """
+    return render_template("auth/register.html")
+
+
+@bp.route("/register", methods=("POST",))
 def register() -> Response:
     """
     Does some validation for registration then if it succeed redirects to login
@@ -30,20 +43,32 @@ def register() -> Response:
     Response
 
     """
-    if request.method == "GET":
-        return render_template("auth/register.html")
+    users = Users()
 
-    error = Users().set_account(request.form, mode="registration")
+    error = users.set_account(request.form, mode="registration")
 
     if error:
         return render_template("auth/register.html", error=error)
 
-    Users().register_new_account(request.form)
+    users.register_new_account(request.form)
 
     return redirect(url_for("auth.login"))
 
 
-@bp.route("/login", methods=("GET", "POST"))
+@bp.route("/login", methods=("GET",))
+def get_login() -> Response:
+    """
+    Renders login template
+
+    Returns
+    -------
+    Response
+
+    """
+    return render_template("auth/login.html")
+
+
+@bp.route("/login", methods=("POST",))
 def login() -> Response:
     """
     Does some validation for login then if it succeed redirects to index page
@@ -58,9 +83,6 @@ def login() -> Response:
     Response
 
     """
-    if request.method == "GET":
-        return render_template("auth/login.html")
-
     email = request.form["email"]
 
     error, users_data = Users().set_account(request.form, mode="login")

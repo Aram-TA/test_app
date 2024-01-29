@@ -22,7 +22,7 @@ if not os.path.exists(config.posts_path):
 app = Flask(__name__)
 
 
-def app_constructor(test_config: dict = {}):
+def app_constructor(test_config: dict = {}) -> None:
     """
     Creates flasks application object, configures it
 
