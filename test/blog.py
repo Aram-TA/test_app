@@ -30,7 +30,7 @@ def index() -> Response:
     )
 
 
-@bp.route("/create", methods=("GET"))
+@bp.route("/create", methods=("GET",))
 @login_required
 def get_create_post() -> Response:
     """

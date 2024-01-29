@@ -16,7 +16,7 @@ from users import Users
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-@bp.route("/register", methods=("GET"))
+@bp.route("/register", methods=("GET",))
 def get_register() -> Response:
     """
     Renders register template

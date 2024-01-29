@@ -75,10 +75,11 @@ class Users:
         str | None
 
         """
+        print(phone_number)
         if not (
             phone_number.replace("-", "").replace(
                 " ", "").replace("+", "").isdigit()
-            and len(phone_number) <= 30 and len(phone_number) <= 6
+            and len(phone_number) <= 30 and len(phone_number) >= 6
         ):
             return "Invalid phone number format."
 
@@ -125,7 +126,6 @@ class Users:
         None | str
 
         """
-
         if not re.match(
                 r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]{1,30}$",
                 email
@@ -148,14 +148,19 @@ class Users:
 
         """
         error = None
+
+        text = "User with that email not found or Incorrect password"
         email = request_form["email"]
 
-        if not check_password_hash(
+        if email not in user_data:
+            error = text
+
+        elif not check_password_hash(
             user_data[email]["password"],
             request_form["password"]
         ) or email not in user_data:
 
-            error = "User with that email not found or Incorrect password"
+            error = text
 
         return error, user_data
 
@@ -170,6 +175,9 @@ class Users:
 
         """
         request_form = kwargs['request_form']
+
+        if request_form["email"] in kwargs["user_data"]:
+            return "That user already exists."
 
         if request_form['password'] !=\
                 request_form['password_repeat']:
