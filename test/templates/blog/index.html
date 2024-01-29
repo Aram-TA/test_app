@@ -2,80 +2,82 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Home</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
 </head>
 
 <body>
-  <header>
-    <nav class="nav_container">
-      <h1 class="nav_header">Some random forum</h1>
-      <ul class="nav_list">
-        {% if session.get("current_user", None) %}
-        <li class="nav_items">
-          <span>{{ session["username"] }}</span>
-        </li>
-        <li class="nav_items">
-          <a href="{{ url_for('auth.logout') }}">Log Out</a>
-        </li>
-        {% else %}
+	<header>
+		<nav class="nav_container">
+			<h1 class="nav_header">Some random forum</h1>
+			<ul class="nav_list">
+				{% if session.get("current_user", None) %}
+				<li class="nav_items">
+					<span>{{ session["username"] }}</span>
+				</li>
+				<li class="nav_items">
+					<a href="{{ url_for('auth.logout') }}">Log Out</a>
+				</li>
+				{% else %}
 
-        <li class="nav_items">
-          <a href="{{ url_for('auth.register') }}">Register</a>
-        </li>
-        <li class="nav_items">
-          <a href="{{ url_for('auth.login') }}">Log In</a>
-          {% endif %}
-        </li>
-      </ul>
-    </nav>
-  </header>
+				<li class="nav_items">
+					<a href="{{ url_for('auth.register') }}">Register</a>
+				</li>
+				<li class="nav_items">
+					<a href="{{ url_for('auth.login') }}">Log In</a>
+					{% endif %}
+				</li>
+			</ul>
+		</nav>
+	</header>
 
-  <main>
-    <article class="main_content">
+	<main>
+		<article class="main_content">
 
-      <section class="post_header">
-        <h3>All messages</h3>
-        {% if session.get("username", None) %}
-        <p><a id="new_post" href="{{ url_for('blog.create_post') }}">New Message</a></p>
-        {% endif %}
-      </section>
+			<section class="post_header">
+				<h3>All messages</h3>
+				{% if session.get("username", None) %}
+				<p><a id="new_post" href="{{ url_for('blog.create_post') }}">New Message</a></p>
+				{% endif %}
+			</section>
 
-      <section class="full_posts">
-        {% for post_id in posts %}
-        <div class="post_title">
-          <ul class="title_list">
-            <li>
-              <p class="about">
-                Message by
-                <span class="underlined">{{ posts[post_id]['author'] }}</span>
-                on {{ posts[post_id]['created'] }}
-              </p>
-            </li>
-            <li>
-              <h3>{{ posts[post_id]['title'] }}</h3>
-            </li>
-          </ul>
+			<section class="full_posts">
+				{% if posts %}
+				{% for post_id in posts %}
+				<div class="post_title">
+					<ul class="title_list">
+						<li>
+							<p class="about">
+								Message by
+								<span class="underlined">{{ posts[post_id]['author'] }}</span>
+								on {{ posts[post_id]['created'] }}
+							</p>
+						</li>
+						<li>
+							<h3>{{ posts[post_id]['title'] }}</h3>
+						</li>
+					</ul>
 
-          {% if session.get("current_user", None) ==
-          posts[post_id]['author_email'] %}
-          <p class="action"><a href="{{ url_for('blog.update_post', post_id=post_id) }}">Edit</a></p>
-        </div>
-        {% endif %}
-        {% if posts[post_id]["body"] %}
-        <p style="margin: 0px; font-style: italic; padding-left: 7px;">Text</p>
-        <p class="post_message">{{ posts[post_id]['body'] }}</p>
-        {% endif %}
-        {% endfor %}
-      </section>
-    </article>
-  </main>
+					{% if session.get("current_user", None) ==
+					posts[post_id]['author_email'] %}
+					<p class="action"><a href="{{ url_for('blog.update_post', post_id=post_id) }}">Edit</a></p>
+					{% endif %}
+				</div>
+				{% if posts[post_id]["body"] %}
+				<p style="margin: 0px; font-style: italic; padding-left: 7px;">Text</p>
+				<p class="post_message">{{ posts[post_id]['body'] }}</p>
+				{% endif %}
+				{% endfor %}
+				{% endif %}
+			</section>
+		</article>
+	</main>
 
-  <footer>
+	<footer>
 
-  </footer>
+	</footer>
 </body>
 
 </html>
