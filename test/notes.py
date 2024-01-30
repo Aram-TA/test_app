@@ -77,6 +77,7 @@ class NotesController:
         posts_data = kwargs["posts_data"]
 
         posts_json.seek(0)
+        posts_json.truncate()
 
         posts_data[kwargs['post_id']].update({
             "title": kwargs['title'],
