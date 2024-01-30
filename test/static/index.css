@@ -10,6 +10,7 @@ body{
 p{
     margin-top: 2%;
     margin-bottom: 2%;
+    white-space-collapse: ;
 }
 figure{
     margin: 0;
@@ -90,5 +91,6 @@ nav h1{
 .post_message{
     margin-top: 0;
     border: solid 1px;
+    word-wrap: break-word;
 }
 
