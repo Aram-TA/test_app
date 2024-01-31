@@ -83,6 +83,22 @@ class Users:
         ):
             return "Invalid phone number format."
 
+    def validate_username(self, username: str) -> None | str:
+        allowed_characters = set(
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-."
+        )
+        usr_length = len(username)
+
+        if usr_length < 1 or usr_length > 36:
+            return """Username should have length that is greater than 0 and
+            less than 36 characters.""".strip()
+
+        for char in username:
+            if char not in allowed_characters:
+                return """You used a character that is not allowed for username
+                Please use latin letters and only underscore, hyphen,
+                period are allowed from special characters.""".strip()
+
     def validate_password(self, password: str) -> None | str:
         """
         Validates password. Function makes sure that password is not empty
@@ -183,7 +199,7 @@ class Users:
                 request_form['password_repeat']:
             return "Passwords in both fields should be same."
 
-        for input_type in ("email", "phone_number", "password"):
+        for input_type in ("email", "phone_number", "username", "password"):
 
             if error := getattr(self, f"validate_{input_type}")(
                 request_form[input_type]

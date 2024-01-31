@@ -23,17 +23,38 @@
       </header>
       <form method="post">
         <label class="ToCenter" for="email">Email</label>
-        <input name="email" id="email" maxlength="36" required />
+        <input
+          type="email"
+          pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{5,}"
+          name="email"
+          id="email"
+          maxlength="36"
+          required
+        />
         <label class="ToCenter" for="phone_number">Phone number</label>
-        <input maxlength="36" name="phone_number" id="phone_number" required />
+        <input
+          type="tel"
+          maxlength="36"
+          name="phone_number"
+          id="phone_number"
+          pattern="^[0-9_ -]{1,36}$"
+          required
+        />
         <label class="ToCenter" for="username">Username</label>
-        <input name="username" maxlength="16 " id="username" required />
+        <input
+          name="username"
+          maxlength="16"
+          pattern="^[a-zA-Z0-9_\-\.]{1,36}$"
+          id="username"
+          required
+        />
         <label class="ToCenter" for="password">Password</label>
         <input
           maxlength="32"
           type="password"
           name="password"
           id="password"
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9_\+\-]+[a-zA-Z0-9_\+\-\s]*$"
           required
         />
         <label class="ToCenter" for="password_repeat">Repeat password</label>
@@ -42,6 +63,7 @@
           type="password"
           name="password_repeat"
           id="password_repeat"
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9_\+\-]+[a-zA-Z0-9_\+\-\s]*$"
           required
         />
         <input id="button" type="submit" value="Register" />
