@@ -10,7 +10,6 @@
 
 <body>
   <main>
-    <section>
       <header>
         <nav><a href="{{ url_for('index')}}">Go back</a></nav>
         <h1>{{ post['title'] }}</h1>
@@ -21,7 +20,7 @@
       <div class="container">
         <form id="form1" method="post">
           <label class="tocenter" for="title">Title</label>
-          <input name="title" id="title" value="{{ request.form['title'] or post['title'] }}" maxlength="30" required>
+          <input name="title" id="title" value="{{ request.form['title'] or post['title'] }}" maxlength="150" required>
           <label class="tocenter" for="body">Text</label>
           <textarea name="body" id="body">{{ request.form['body'] or post['body'] }}</textarea>
           <p class="tocenter"><input style="display: block;" class="button" type="submit" value="Save"></p>
@@ -30,7 +29,6 @@
           <input class="button" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
         </form>
       </div>
-    </section>
   </main>
 
 </body>

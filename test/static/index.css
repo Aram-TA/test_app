@@ -10,7 +10,6 @@ body{
 p{
     margin-top: 2%;
     margin-bottom: 2%;
-    white-space-collapse: ;
 }
 figure{
     margin: 0;
@@ -22,6 +21,7 @@ figcaption{
     margin-top: 2%;
     font-weight: bold;
     margin-left: 1%;
+    overflow-wrap: break-word;
 }
 nav{
     margin-bottom: 1%;
