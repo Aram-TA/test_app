@@ -10,25 +10,26 @@
 
 <body>
   <main>
-      <header>
-        <nav><a href="{{ url_for('index')}}">Go back</a></nav>
-        <h1>{{ post['title'] }}</h1>
-      </header>
-      {% if error %}
-      <p>{{ error }}</p>
-      {% endif %}
-      <div class="container">
-        <form id="form1" method="post">
-          <label class="tocenter" for="title">Title</label>
-          <input name="title" id="title" value="{{ request.form['title'] or post['title'] }}" maxlength="150" required>
-          <label class="tocenter" for="body">Text</label>
-          <textarea name="body" id="body">{{ request.form['body'] or post['body'] }}</textarea>
-          <p class="tocenter"><input style="display: block;" class="button" type="submit" value="Save"></p>
-        </form>
-        <form action="{{ url_for('blog.delete_post', post_id=post_id) }}" method="post" id="form2">
-          <input class="button" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
-        </form>
-      </div>
+    <header>
+      <nav><a href="{{ url_for('index')}}">Go back</a></nav>
+      <h1>{{ post['title'] }}</h1>
+    </header>
+    {% if error %}
+    <p style="text-align: center;">{{ error }}</p>
+    {% endif %}
+    <div class="container">
+      <form id="form1" method="post">
+        <label class="tocenter" for="title">Title</label>
+        <input name="title" class="textfield" value="{{ request.form['title'] or post['title'] }}" maxlength="150"
+          required>
+        <label class="tocenter" for="body">Text</label>
+        <textarea name="body" class="textfield">{{ request.form['body'] or post['body'] }}</textarea>
+        <input class="button textfield" type="submit" value="Save">
+      </form>
+      <form action="{{ url_for('blog.delete_post', post_id=post_id) }}" method="post" id="form2">
+        <input class="button textfield" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+      </form>
+    </div>
   </main>
 
 </body>

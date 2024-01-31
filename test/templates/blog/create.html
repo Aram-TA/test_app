@@ -9,28 +9,21 @@
 </head>
 
 <body>
-  <header>
-    <h1>New post</h1>
-  </header>
   <main>
-    <article class="main_content">
-      {% if error %}
-      <p>{{ error }}</p>
-      {% endif %}
-      <form method="post">
-        <ul class="form_container">
-          <div class="title_container">
-            <label for="title">Title</label><br>
-            <input name="title" id="title" value="{{ request.form['title'] }}" required>
-          </div>
-          <div class="text_container">
-            <br><label for="body">Text</label><br>
-            <textarea name="body" id="body">{{ request.form['body'] }}</textarea>
-            <br><input type="submit" value="Save">
-          </div>
-        </ul>
-      </form>
-    </article>
+    <header>
+      <nav><a href="{{ url_for('index')}}">Go back</a></nav>
+      <h1>New post</h1>
+    </header>
+    {% if error %}
+    <p style="text-align: center;">{{ error }}</p>
+    {% endif %}
+    <form id="form1" method="post">
+      <label class="tocenter" for="title">Title</label>
+      <input name="title" class="textfield" value="{{ request.form['title'] }}" maxlength="150" required>
+      <label class="tocenter" for="body">Text</label>
+      <textarea name="body" class="textfield">{{ request.form['body'] }}</textarea>
+      <input style="margin-bottom: 2em;" class="textfield" type="submit" value="Save">
+    </form>
   </main>
 
 </body>
