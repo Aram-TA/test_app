@@ -8,18 +8,17 @@ import auth
 import config
 
 
-if not os.path.exists("data"):
-    os.mkdir("data")
+def init_files():
+    if not os.path.exists("data"):
+        os.mkdir("data")
 
-if not os.path.exists(config.users_path):
-    with open(config.users_path, "w") as users_file:
-        json.dump({}, users_file, indent=2)
+    if not os.path.exists(config.users_path):
+        with open(config.users_path, "w") as users_file:
+            json.dump({}, users_file, indent=2)
 
-if not os.path.exists(config.posts_path):
-    with open(config.posts_path, "w") as posts_file:
-        json.dump({}, posts_file, indent=2)
-
-app = Flask(__name__)
+    if not os.path.exists(config.posts_path):
+        with open(config.posts_path, "w") as posts_file:
+            json.dump({}, posts_file, indent=2)
 
 
 def app_constructor(test_config: dict = {}) -> None:
@@ -35,7 +34,7 @@ def app_constructor(test_config: dict = {}) -> None:
     None
 
     """
-
+    app = Flask(__name__)
     app.secret_key = "dev"
 
     if not test_config:
@@ -47,8 +46,10 @@ def app_constructor(test_config: dict = {}) -> None:
     app.register_blueprint(auth.bp)
     app.register_blueprint(blog.bp)
     app.add_url_rule("/", endpoint="index")
+    return app
 
 
 if __name__ == "__main__":
-    app_constructor()
+    init_files()
+    app = app_constructor()
     app.run(debug=True)

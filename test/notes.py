@@ -7,6 +7,9 @@ import config
 
 
 class NotesController:
+    """
+    Class that validates, creates, deletes, and updates notes/posts
+    """
     __slots__ = "posts_path",
 
     def __init__(self) -> None:
@@ -28,8 +31,8 @@ class NotesController:
         self,
         action: str,
         post_id: str | None,
-        title: str | None,
-        body: str | None
+        title: str | None = None,
+        body: str | None = None
     ) -> None | bool | dict:
         """
         Interface that opens necessary files for needed function and does
@@ -42,6 +45,10 @@ class NotesController:
         post_id : str | None
         title : str | None
         body : str | None
+
+        Returns
+        -------
+        None | bool | dict
 
         """
         with open(self.posts_path, "r+") as posts_json:
@@ -64,10 +71,9 @@ class NotesController:
 
         current_post = kwargs["posts_data"][kwargs["post_id"]]
 
-        if current_post["author_email"] \
-                != session["current_user"]:
+        if current_post["author_email"] != session["current_user"]:
             return
-
+        # We will  return current post in the end if everything is ok
         return current_post
 
     def delete_post(self, **kwargs) -> None:

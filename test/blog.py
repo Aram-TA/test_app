@@ -10,6 +10,7 @@ from flask import (
 from auth import login_required
 from notes import NotesController
 
+notes_controller = NotesController()
 bp = Blueprint("blog", __name__)
 
 
@@ -25,7 +26,7 @@ def index() -> Response:
     """
     return render_template(
         "blog/index.html",
-        posts=NotesController().get_posts_data(),
+        posts=notes_controller.get_posts_data(),
     )
 
 
@@ -63,7 +64,7 @@ def create_post() -> Response:
             error="Title is required"
         )
 
-    NotesController().set_post("create", None, title, request.form["body"])
+    notes_controller.set_post("create", None, title, request.form["body"])
 
     return redirect(url_for("index"))
 
@@ -84,8 +85,7 @@ def get_update_post(post_id: str) -> Response:
     Response
 
     """
-    notes_controller = NotesController()
-    current_post = notes_controller.set_post("validate", post_id, None, None)
+    current_post = notes_controller.set_post("validate", post_id)
 
     if not current_post:
         return redirect(url_for("index"))
@@ -112,9 +112,7 @@ def update_post(post_id: str) -> Response:
     Response
 
     """
-    notes_controller = NotesController()
-
-    if not notes_controller.set_post("validate", post_id, None, None):
+    if not notes_controller.set_post("validate", post_id):
         return redirect(url_for("index"))
 
     title = request.form["title"]
@@ -150,11 +148,9 @@ def delete_post(post_id: str) -> Response:
     Response
 
     """
-    notes_controller = NotesController()
-
-    if not notes_controller.set_post("validate", post_id, None, None):
+    if not notes_controller.set_post("validate", post_id):
         return redirect(url_for("index"))
 
-    notes_controller.set_post("delete", post_id, None, None)
+    notes_controller.set_post("delete", post_id)
 
     return redirect(url_for("index"))

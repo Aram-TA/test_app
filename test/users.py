@@ -64,7 +64,7 @@ class Users:
 
     def validate_phone_number(self, phone_number: str) -> None | str:
         """
-        Validates phone number by using regex
+        Validates phone number
 
         Parameters
         -----------
@@ -75,17 +75,39 @@ class Users:
         str | None
 
         """
-        print(phone_number)
-        if not (
-            phone_number.replace("-", "").replace(
-                " ", "").replace("+", "").isdigit()
-            and len(phone_number) <= 30 and len(phone_number) >= 6
-        ):
-            return "Invalid phone number format."
+        if not phone_number:
+            return "Phone number can't be empty."
+
+        cleaned_phone = phone_number.replace(
+            "-", "").replace(" ", "").replace("+", "")
+
+        if not cleaned_phone.isdigit():
+            return """You used a character that is not allowed for phone number
+                Please use arabic digit. From special
+                characters only underscore, space, period
+                and plus are allowed from special characters.""".strip()
+
+        number_length = len(cleaned_phone)
+
+        if not (6 <= number_length <= number_length <= 36):
+            return """Phone number should be longer that 6 characters
+                    and less than 37.""".strip()
 
     def validate_username(self, username: str) -> None | str:
+        """
+        Validates username
+
+        Parameters
+        -----------
+        username : str
+
+        Returns
+        -------
+        str | None
+
+        """
         allowed_characters = set(
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-."
+            f"_-.{ascii_lowercase}{ascii_uppercase}{digits}"
         )
         usr_length = len(username)
 
@@ -101,7 +123,7 @@ class Users:
 
     def validate_password(self, password: str) -> None | str:
         """
-        Validates password. Function makes sure that password is not empty
+        Validates password. Function makes sure that password format is right
 
         Parameters
         -----------
@@ -112,22 +134,19 @@ class Users:
         str | None
 
         """
+        pwd_set = set(password)
+
         if not password:
             return "Password is required."
 
-        have_digit, have_lowercase, have_uppercase = False, False, False
+        if not pwd_set | set(ascii_lowercase):
+            return "Password should contain at least 1 lowercase letters."
 
-        for char in password:
-            if char in ascii_lowercase:
-                have_lowercase = True
-            elif char in ascii_uppercase:
-                have_uppercase = True
-            elif char in digits:
-                have_digit = True
+        if not pwd_set | set(ascii_uppercase):
+            return "Password should contain at least 1 uppercase letters."
 
-        if not all((have_lowercase, have_uppercase, have_digit)):
-            return """Password should contain at least 1 digit,
-            1 uppercase and 1 lowercase letters."""
+        if not pwd_set | set(digits):
+            return "Password should contain at least 1 digit."
 
     def validate_email(self, email: str) -> None | str:
         """
