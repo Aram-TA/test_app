@@ -1,7 +1,6 @@
 from flask import (
     url_for,
     request,
-    session,
     Response,
     redirect,
     Blueprint,
@@ -85,10 +84,10 @@ def get_update_post(post_id: str) -> Response:
     Response
 
     """
-    current_post = NotesController().get_posts_data()[post_id]
+    notes_controller = NotesController()
+    current_post = notes_controller.set_post("validate", post_id, None, None)
 
-    if current_post["author_email"] \
-            != session["current_user"]:
+    if not current_post:
         return redirect(url_for("index"))
 
     return render_template(
@@ -113,6 +112,11 @@ def update_post(post_id: str) -> Response:
     Response
 
     """
+    notes_controller = NotesController()
+
+    if not notes_controller.set_post("validate", post_id, None, None):
+        return redirect(url_for("index"))
+
     title = request.form["title"]
 
     if not title:
@@ -121,7 +125,7 @@ def update_post(post_id: str) -> Response:
             error="Title is required"
         )
 
-    NotesController().set_post(
+    notes_controller.set_post(
         "update",
         post_id,
         title,
@@ -146,5 +150,11 @@ def delete_post(post_id: str) -> Response:
     Response
 
     """
-    NotesController().set_post("delete", post_id, None, None)
+    notes_controller = NotesController()
+
+    if not notes_controller.set_post("validate", post_id, None, None):
+        return redirect(url_for("index"))
+
+    notes_controller.set_post("delete", post_id, None, None)
+
     return redirect(url_for("index"))

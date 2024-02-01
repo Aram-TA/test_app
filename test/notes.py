@@ -30,7 +30,7 @@ class NotesController:
         post_id: str | None,
         title: str | None,
         body: str | None
-    ) -> None:
+    ) -> None | bool | dict:
         """
         Interface that opens necessary files for needed function and does
         file manipulations. It's created because we don't want to open
@@ -47,13 +47,28 @@ class NotesController:
         with open(self.posts_path, "r+") as posts_json:
             posts_data = json.load(posts_json)
 
-            getattr(self, f"{action}_post")(
+            return getattr(self, f"{action}_post")(
                 posts_data=posts_data,
                 posts_json=posts_json,
                 post_id=post_id,
                 title=title,
                 body=body
             )
+
+    def validate_post(self, **kwargs):
+        """
+        Validates post id when user want to get, delete or update post
+        """
+        if kwargs["post_id"] not in kwargs["posts_data"]:
+            return
+
+        current_post = kwargs["posts_data"][kwargs["post_id"]]
+
+        if current_post["author_email"] \
+                != session["current_user"]:
+            return
+
+        return current_post
 
     def delete_post(self, **kwargs) -> None:
         """
