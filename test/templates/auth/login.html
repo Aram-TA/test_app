@@ -13,7 +13,7 @@
   <body>
     <main>
       {% if error %}
-      <p class="error_massage">{{ error }}</p>
+      <p id="error">{{ error }}</p>
       {% endif %}
       <header>
         <nav class="nav_container">
@@ -23,7 +23,14 @@
       </header>
       <form method="post" class="reg_form">
         <label class="ToCenter" for="email">Email</label>
-        <input type="email" class="Input" name="email" maxlength="36" id="email" required />
+        <input
+          type="email"
+          class="Input"
+          name="email"
+          maxlength="36"
+          id="email"
+          required
+        />
         <label class="ToCenter" for="password">Password</label>
         <input
           class="Input"
@@ -35,7 +42,9 @@
         />
         <input class="Button Input" type="submit" value="Log in" />
         <p class="ToCenter">Don&apos;t have an account?</p>
-        <p class="ToCenter"><a href="{{ url_for('auth.register') }}">Register</a></p>
+        <p class="ToCenter">
+          <a href="{{ url_for('auth.register') }}">Register</a>
+        </p>
       </form>
     </main>
   </body>

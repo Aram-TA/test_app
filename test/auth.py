@@ -47,7 +47,7 @@ def register() -> Response:
     if error := users.set_account(request.form, mode="registration"):
         return render_template("auth/register.html", error=error)
 
-    users.register_new_account(request.form)
+    users.set_account(request.form, mode="reg_new_acc")
 
     return redirect(url_for("auth.login"))
 
