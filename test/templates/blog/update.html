@@ -13,7 +13,7 @@
   <body>
     <main>
       <header>
-        <nav><a href="{{ url_for('index')}}">Go back</a></nav>
+        <nav><a href="{{ url_for('blog.home')}}">Go back</a></nav>
         <h1>{{ post['title'] }}</h1>
       </header>
       {% if error %}
@@ -36,7 +36,7 @@
           <input class="button textfield" type="submit" value="Save" />
         </form>
         <form
-          action="{{ url_for('blog.delete_post', post_id=post_id, page_id=page_id) }}"
+          action="{{ url_for('blog.delete_post', post_id=post_id,) }}"
           method="post"
           id="form2"
         >

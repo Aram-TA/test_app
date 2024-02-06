@@ -14,6 +14,8 @@
     <header>
       <nav>
         <h1>Some random forum</h1>
+        <a href="{{ url_for('blog.home', page=page - 1) }}">Previous Page</a>
+        <a href="{{ url_for('blog.home', page=page + 1) }}">Next Page</a>
         {% if session.get("current_user", None) %}
         <div class="nav_div">
           <p><span>{{ session["username"] }}</span></p>
@@ -40,7 +42,7 @@
         <p id="ph4" class="ph_g_fi">Filter</p>
       </section>
 
-      {% if posts %} {% for post_id in current_page %}
+      {% for post_id in items_on_page %}
       <article class="content_list">
         <div class="title_div">
           <p class="title_p">
@@ -53,7 +55,7 @@
           posts[post_id]['author_email'] %}
           <a
             class="action"
-            href="{{ url_for('blog.update_post', post_id=post_id, page_id=page_id) }}"
+            href="{{ url_for('blog.update_post', post_id=post_id) }}"
             >Edit</a
           >
           {% endif %}
@@ -66,7 +68,7 @@
           {% endif %}
         </figure>
       </article>
-      {% endfor %} {% endif %}
+      {% endfor %}
     </main>
   </body>
 </html>

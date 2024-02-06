@@ -27,11 +27,11 @@ def index() -> Response:
     Response
 
     """
-    return redirect(url_for("blog.home", page_id="1"))
+    return redirect(url_for("blog.home"))
 
 
-@bp.route("/home/<page_id>")
-def home(page_id) -> Response:
+@bp.route("/home")
+def home() -> Response:
     """
     Returns rendered index template when client goes to "/" url
 
@@ -40,17 +40,25 @@ def home(page_id) -> Response:
     Response
 
     """
-    pages_data = pages_controller.set_page("get", None, None)
+    posts = notes_controller.get_posts_data()
 
-    if page_id not in pages_data:
-        return redirect(url_for("index", page_id="1"))
+    page = request.args.get("page", 1, type=int)
+    items_per_page = 10
+    start = (page - 1) * items_per_page
+    end = start + items_per_page
+
+    total_pages = (len(posts) + items_per_page - 1) // items_per_page
+    items_on_page = list(posts.keys())[start:end]
+
+    if page > total_pages or page < 1:
+        return redirect(url_for("blog.home", page=total_pages))
 
     return render_template(
         "blog/index.html",
-        posts=notes_controller.get_posts_data(),
-        current_page=pages_data[page_id],
-        pages_list=pages_data.keys(),
-        page_id=page_id
+        posts=posts,
+        items_on_page=items_on_page,
+        total_pages=total_pages,
+        page=page
     )
 
 
@@ -83,26 +91,25 @@ def create_post() -> Response:
     title = request.form["title"]
 
     if not title:
+
         return render_template(
             "blog/create.html",
             error="Title is required"
         )
 
-    new_post_id = notes_controller.set_post(
+    notes_controller.set_post(
         "create",
         None,
         title,
         request.form["body"]
     )
 
-    page_id = pages_controller.set_page("add", new_post_id, None)
-
-    return redirect(url_for("blog.home", page_id=page_id))
+    return redirect(url_for("blog.home"))
 
 
-@bp.route("/update/<page_id>/<post_id>", methods=("GET",))
+@bp.route("/update/<post_id>", methods=("GET",))
 @login_required
-def get_update_post(Page_id: str, post_id: str) -> Response:
+def get_update_post(post_id: str) -> Response:
     """
     Renders page for post updating for user, if validation is ok. If not
     redirects to index page
@@ -116,21 +123,19 @@ def get_update_post(Page_id: str, post_id: str) -> Response:
     Response
 
     """
-    current_post = notes_controller.set_post("validate", post_id)
-
-    if not current_post:
-        return redirect(url_for("index"))
+    if not notes_controller.set_post("validate", post_id):
+        return redirect(url_for("blog.home"))
 
     return render_template(
         "blog/update.html",
-        post=current_post,
+        post=notes_controller.set_post("validate", post_id),
         post_id=post_id
     )
 
 
-@bp.route("/update/<page_id>/<post_id>", methods=("POST",))
+@bp.route("/update/<post_id>", methods=("POST",))
 @login_required
-def update_post(page_id: str, post_id: str) -> Response:
+def update_post(post_id: str) -> Response:
     """
     Updates post by post_id by using NotesController
 
@@ -143,21 +148,16 @@ def update_post(page_id: str, post_id: str) -> Response:
     Response
 
     """
-    pages_data = pages_controller.set_page("get", None, None)
-
-    if page_id not in pages_data:
-        return redirect(url_for("index", page_id="1"))
-
-    if post_id not in pages_data[page_id] \
-            or not notes_controller.set_post("validate", post_id):
-
-        return redirect(url_for("index"))
+    if not notes_controller.set_post("validate", post_id):
+        return redirect(url_for("blog.home", page_id="1"))
 
     title = request.form["title"]
 
     if not title:
         return render_template(
             "blog/update.html",
+            current_post=notes_controller.set_post("validate", post_id),
+            post_id=post_id,
             error="Title is required"
         )
 
@@ -168,12 +168,12 @@ def update_post(page_id: str, post_id: str) -> Response:
         request.form["body"]
     )
 
-    return redirect(url_for("index"))
+    return redirect(url_for("blog.home"))
 
 
-@bp.route("/delete/<page_id>/<post_id>", methods=("POST",))
+@bp.route("/delete/<post_id>", methods=("POST",))
 @login_required
-def delete_post(page_id: str, post_id: str) -> Response:
+def delete_post(post_id: str) -> Response:
     """
     Deletes post by post_id
 
@@ -186,18 +186,9 @@ def delete_post(page_id: str, post_id: str) -> Response:
     Response
 
     """
-    pages_data = pages_controller.set_page("get", None, None)
-
-    if page_id not in pages_data:
-        return redirect(url_for("index", page_id="1"))
-
-    if post_id not in pages_data[page_id] \
-            or not notes_controller.set_post("validate", post_id):
-
-        return redirect(url_for("index"))
+    if not notes_controller.set_post("validate", post_id):
+        return redirect(url_for("blog.home", page_id="1"))
 
     notes_controller.set_post("delete", post_id)
-
-    pages_controller.delete_data("delete", post_id, page_id)
 
     return redirect(url_for("index"))

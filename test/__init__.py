@@ -1,5 +1,4 @@
 import os
-import json
 
 from flask import Flask
 
@@ -22,10 +21,6 @@ def init_files():
     if not os.path.exists(config.posts_path):
         with open(config.posts_path, "w") as posts_file:
             posts_file.write("{}")
-
-    if not os.path.exists(config.pages_path):
-        with open(config.pages_path, "w") as pages_file:
-            json.dump({"1": {}}, pages_file, indent=2)
 
 
 def app_constructor(test_config: dict = {}) -> None:

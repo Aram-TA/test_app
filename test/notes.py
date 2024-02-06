@@ -48,7 +48,7 @@ class NotesController:
 
         Returns
         -------
-        None | bool | dict
+        None | bool | dict | str
 
         """
         with open(self.posts_path, "r+") as posts_json:
@@ -89,7 +89,9 @@ class NotesController:
         """
         Deletes post by id from database
         """
+
         del posts_data[kwargs['post_id']]
+
         self.__write_data(posts_data, posts_json)
 
     def update_post(self, posts_data: dict, posts_json, **kwargs) -> None:
@@ -108,8 +110,10 @@ class NotesController:
         Creates new key value pair where value have all necessary data
         about post then saves it to database
         """
-        post_id = 1 if not posts_data else str(
-                int(tuple(posts_data.keys())[-1]) + 1)
+        key, post = posts_data.popitem()
+        posts_data[key] = post  # I took last key by pop then restored dict
+
+        post_id = "1" if not posts_data else str(int(key) + 1)
 
         posts_data[post_id] = {
             "title": kwargs['title'],
@@ -119,4 +123,3 @@ class NotesController:
             "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
         self.__write_data(posts_data, posts_json)
-        return post_id
