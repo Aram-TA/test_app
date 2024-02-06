@@ -33,7 +33,7 @@ class NotesController:
         post_id: str | None,
         title: str | None = None,
         body: str | None = None
-    ) -> None | bool | dict:
+    ) -> None | bool | dict | str:
         """
         Interface that opens necessary files for needed function and does
         file manipulations. It's created because we don't want to open
@@ -41,7 +41,7 @@ class NotesController:
 
         Parameters
         ----------
-        action : str
+        action : str | "create" | "update" | "validate" | "delete"
         post_id : str | None
         title : str | None
         body : str | None
@@ -62,9 +62,18 @@ class NotesController:
                 body=body
             )
 
-    def validate_post(self, **kwargs):
+    def __write_data(self, posts_data: dict, posts_json):
+        posts_json.seek(0)
+        posts_json.truncate()
+        json.dump(posts_data, posts_json, indent=2)
+
+    def validate_post(self, **kwargs) -> None | dict:
         """
         Validates post id when user want to get, delete or update post
+
+        Returns
+        -------
+        dict | None
         """
         if kwargs["post_id"] not in kwargs["posts_data"]:
             return
@@ -76,51 +85,31 @@ class NotesController:
         # We will  return current post in the end if everything is ok
         return current_post
 
-    def delete_post(self, **kwargs) -> None:
+    def delete_post(self, posts_data: dict, posts_json, **kwargs) -> None:
         """
         Deletes post by id from database
         """
-        posts_json = kwargs['posts_json']
-        posts_data = kwargs['posts_data']
-
-        posts_json.seek(0)
-        posts_json.truncate()
-
         del posts_data[kwargs['post_id']]
+        self.__write_data(posts_data, posts_json)
 
-        json.dump(posts_data, posts_json, indent=2)
-
-    def update_post(self, **kwargs) -> None:
+    def update_post(self, posts_data: dict, posts_json, **kwargs) -> None:
         """
         Updates posts_data dict then saves new data
         """
-        posts_json = kwargs['posts_json']
-        posts_data = kwargs["posts_data"]
-
-        posts_json.seek(0)
-        posts_json.truncate()
-
         posts_data[kwargs['post_id']].update({
             "title": kwargs['title'],
             "body": kwargs['body'],
             "updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
+        self.__write_data(posts_data, posts_json)
 
-        json.dump(posts_data, posts_json, indent=2)
-
-    def create_post(self, **kwargs) -> None:
+    def create_post(self, posts_data: dict, posts_json, **kwargs) -> None:
         """
         Creates new key value pair where value have all necessary data
         about post then saves it to database
         """
-        posts_json = kwargs['posts_json']
-        posts_data = kwargs["posts_data"]
-        post_id = kwargs['post_id']
-
-        posts_json.seek(0)
-
-        post_id = 1 if not posts_data else int(max(
-            posts_data)) + 1
+        post_id = 1 if not posts_data else str(
+                int(tuple(posts_data.keys())[-1]) + 1)
 
         posts_data[post_id] = {
             "title": kwargs['title'],
@@ -129,4 +118,5 @@ class NotesController:
             "author_email": session["current_user"],
             "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
-        json.dump(posts_data, posts_json, indent=2)
+        self.__write_data(posts_data, posts_json)
+        return post_id

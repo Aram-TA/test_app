@@ -9,16 +9,23 @@ import config
 
 
 def init_files():
+    """
+    Creates all necessary files for file system.
+    """
     if not os.path.exists("data"):
         os.mkdir("data")
 
     if not os.path.exists(config.users_path):
         with open(config.users_path, "w") as users_file:
-            json.dump({}, users_file, indent=2)
+            users_file.write("{}")
 
     if not os.path.exists(config.posts_path):
         with open(config.posts_path, "w") as posts_file:
-            json.dump({}, posts_file, indent=2)
+            posts_file.write("{}")
+
+    if not os.path.exists(config.pages_path):
+        with open(config.pages_path, "w") as pages_file:
+            json.dump({"1": {}}, pages_file, indent=2)
 
 
 def app_constructor(test_config: dict = {}) -> None:

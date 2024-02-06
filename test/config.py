@@ -4,3 +4,4 @@ Add you'r constants if needed."""
 
 users_path = os.path.join("data", "users.json")
 posts_path = os.path.join("data", "notes.json")
+pages_path = os.path.join("data", "pages.json")
