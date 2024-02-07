@@ -2,30 +2,42 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Search Post</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Search Post</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='search.css') }}">
 </head>
 
 <body>
-  <header>
-    <p><a href="{{ url_for('blog.home') }}">Go Home</a></p>
-  </header>
-  <main>
-    <form method="post">
-      <input name="search_keyword" type="text">
-      <input type="submit" value="Search" />
-    </form>
-    {% if search_result %}
-    {% for post_id, data in search_result %}
-    <p>{{ data['title'] }}</p>
-    {% if data['body'] %}
-    <p><a href="{{ url_for('blog.read_post', post_id=post_id) }}">Read Post</a></p>
-    {% endif %}
-    {% endfor %}
-    {% endif %}
-  </main>
+	<div id="content">
+		<header>
+			<h1>Search</h1>
+			<nav>
+				<a href="{{ url_for('blog.home') }}">Go Home</a>
+			</nav>
+		</header>
+		<main>
+			<form id="main_form" method="post">
+				<input id="sch_input" name="search_keyword" maxlength="150" type="text">
+				<input type="submit" value="Search" />
+			</form>
 
+			{% if search_result %}
+			<div id="result">
+				{% for post_id, data in search_result %}
+				<div id="title">
+					<p style="flex-basis: 70%;">{{ post_id }}:&nbsp{{ data['title'] }}</p>
+					{% if data['body'] %}
+					<a href="{{ url_for('blog.read_post', post_id=post_id) }}">
+						ReadPost
+					</a>
+					{% endif %}
+				</div>
+				{% endfor %}
+			</div>
+			{% endif %}
+		</main>
+	</div>
 </body>
 
 </html>

@@ -1,30 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New Post</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='create.css') }}" />
-</head>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>New Post</title>
+		<link rel="stylesheet"
+			href="{{ url_for('static', filename='create.css') }}" />
+	</head>
 
-<body>
-  <main>
-    <header>
-      <nav><a href="{{ url_for('index')}}">Go back</a></nav>
-      <h1>New post</h1>
-    </header>
-    {% if error %}
-    <p id="error">{{ error }}</p>
-    {% endif %}
-    <form id="form1" method="post">
-      <label class="tocenter" for="title">Title</label>
-      <input name="title" class="textfield" value="{{ request.form['title'] }}" maxlength="150" required />
-      <label class="tocenter" for="body">Text</label>
-      <textarea name="body" class="textfield">{{ request.form['body'] }}</textarea>
-      <input style="margin-bottom: 2em" class="textfield" type="submit" value="Save" />
-    </form>
-  </main>
-</body>
+	<body>
+		<main>
+			<header>
+				<nav><a href="{{ url_for('index')}}">Go back</a></nav>
+				<h1>New post</h1>
+			</header>
+			{% if error %}
+			<p id="error">{{ error }}</p>
+			{% endif %}
+			<form id="form1" method="post">
+				<label class="tocenter" for="title">Title</label>
+				<input name="title" class="textfield"
+					value="{{ request.form['title'] }}" maxlength="150" required />
+				<label class="tocenter" for="body">Text</label>
+				<textarea name="body"
+					class="textfield">{{ request.form['body'] }}</textarea>
+				<input style="margin-bottom: 2em" class="textfield" type="submit"
+					value="Save" />
+			</form>
+		</main>
+	</body>
 
 </html>

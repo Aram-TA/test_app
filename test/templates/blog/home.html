@@ -2,68 +2,76 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Home</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}" />
 </head>
 
 <body>
-  <header>
-    <nav>
-      <h1>Some random forum</h1>
-      <a href="{{ url_for('blog.home', page=page - 1) }}">Previous Page</a>
-      <a href="{{ url_for('blog.home', page=page + 1) }}">Next Page</a>
-      {% if session.get("current_user", None) %}
-      <div class="nav_div">
-        <p><span>{{ session["username"] }}</span></p>
-        <p><a href="{{ url_for('auth.logout') }}">Log Out</a></p>
-      </div>
-      {% else %}
-      <div class="nav_div">
-        <p><a href="{{ url_for('auth.register') }}">Register</a></p>
-        <p><a href="{{ url_for('auth.login') }}">Log In</a></p>
-      </div>
-      {% endif %}
-    </nav>
-  </header>
+	<header>
+		<nav>
+			<h1>Some random forum</h1>
+			<a href="{{ url_for('blog.home', page=page - 1) }}">Previous
+				Page</a>
+			<a href="{{ url_for('blog.home', page=page + 1) }}">Next
+				Page</a>
+			{% if session.get("current_user", None) %}
+			<div class="nav_div">
+				<p><span>{{ session["username"] }}</span></p>
+				<p><a href="{{ url_for('auth.logout') }}">Log Out</a></p>
+			</div>
+			{% else %}
+			<div class="nav_div">
+				<p><a href="{{ url_for('auth.register') }}">Register</a></p>
+				<p><a href="{{ url_for('auth.login') }}">Log In</a></p>
+			</div>
+			{% endif %}
+		</nav>
+	</header>
 
-  <main>
-    <section class="posts_header">
-      <h3 id="ph1" class="ph_g_fi">All messages</h3>
-      <h3 id="ph2" class="ph_g_fi">Top Topics</h3>
-      {% if session.get("username", None) %}
-      <a id="ph3" class="ph_g_fi" href="{{ url_for('blog.create_post') }}">New Message</a>
-      {% endif %}
-      <p id="ph4" class="ph_g_fi"><a href="{{ url_for('blog.get_search') }}">Search</a></p>
-    </section>
+	<main>
+		<section class="posts_header">
+			<h3 id="ph1" class="ph_g_fi">All messages</h3>
+			<h3 id="ph2" class="ph_g_fi">Top Topics</h3>
+			{% if session.get("username", None) %}
+			<a id="ph3" class="ph_g_fi" href="{{ url_for('blog.create_post') }}">New
+				Message</a>
+			{% endif %}
+			<p id="ph4" class="ph_g_fi"><a
+					href="{{ url_for('blog.get_search') }}">Search</a></p>
+		</section>
 
-    {% for post_id in items_on_page %}
-    <article class="content_list">
-      <div class="title_div">
-        <p class="title_p">
-          Message by
-          <span class="underlined">{{ posts[post_id]['author'] }}</span>
-          on {{ posts[post_id]['created'] }}
-        </p>
+		{% for post_id in items_on_page %}
+		<article class="content_list">
+			<div class="info">
+				<p style="margin: 0;">
+					Message by
+					<span class="underlined">{{ posts[post_id]['author'] }}</span>
+					on {{ posts[post_id]['created'] }}
+				</p>
 
-        {% if session.get("current_user", None) == posts[post_id]['author_email'] %}
-        <a class="action" href="{{ url_for('blog.update_post', post_id=post_id) }}">Edit</a>
-        {% endif %}
-        {% if posts[post_id]['body'] %}
-        <a class="action" href="{{ url_for('blog.read_post', post_id=post_id) }}">Read Post</a>
-        {% endif %}
-      </div>
+				{% if session.get("current_user", None) ==
+				posts[post_id]['author_email'] %}
+				<a class="action"
+					href="{{ url_for('blog.update_post', post_id=post_id) }}">Edit</a>
+				{% endif %}
+				{% if posts[post_id]['body'] %}
+				<a class="action"
+					href="{{ url_for('blog.read_post', post_id=post_id) }}">Read
+					Post</a>
+				{% endif %}
+			</div>
 
-      <figure>
-        <figcaption>{{ posts[post_id]['title'] }}</figcaption>
-        {% if posts[post_id]["body"] %}
-        <p class="post_message">{{ posts[post_id]['body'] }}</p>
-        {% endif %}
-      </figure>
-    </article>
-    {% endfor %}
-  </main>
+			<div id="post_body">
+				<div id="title">{{ posts[post_id]['title'] }}</div>
+				{% if posts[post_id]["body"] %}
+				<p class="post_message">{{ posts[post_id]['body'] }}</p>
+				{% endif %}
+			</div>
+		</article>
+		{% endfor %}
+	</main>
 </body>
 
 </html>

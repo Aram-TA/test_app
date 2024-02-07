@@ -2,20 +2,24 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Read Post {{ post["title"] }}</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Read Post {{ post["title"] }}</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='read-post.css') }}">
 </head>
 
 <body>
-    <header>
-        <h1 id="header">{{ post["title"] }}</h1>
-        <p><a href="{{ url_for('blog.home') }}">Go Home</a></p>
-    </header>
-    <main>
-        <p>{{ post["body"] }}</p>
-    </main>
-
-</body> 
+	<div id="content">
+	<header>
+		<h1 id="header">{{ post["title"] }}</h1>
+		<nav>
+			<a href="{{ url_for('blog.home') }}">Go Home</a>
+		</nav>
+	</header>
+	<main>
+		<p>{{ post["body"] }}</p>
+	</main>
+	</div>
+	</body>
 
 </html>
