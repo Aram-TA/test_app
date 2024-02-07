@@ -9,18 +9,16 @@ from flask import (
 
 from auth import login_required
 from notes import NotesController
-from pages import PageController
 
 
 notes_controller = NotesController()
-pages_controller = PageController()
 bp = Blueprint("blog", __name__)
 
 
 @bp.route("/")
 def index() -> Response:
     """
-    Returns rendered index template when client goes to "/" url
+    Redirects to home when client goes to "/" url
 
     Returns
     -------
@@ -30,35 +28,60 @@ def index() -> Response:
     return redirect(url_for("blog.home"))
 
 
-@bp.route("/home")
+@bp.route("/home", methods=("GET",))
 def home() -> Response:
     """
-    Returns rendered index template when client goes to "/" url
+    Returns rendered home template when client goes to "/" url
 
     Returns
     -------
     Response
 
     """
-    posts = notes_controller.get_posts_data()
-
-    page = request.args.get("page", 1, type=int)
-    items_per_page = 10
-    start = (page - 1) * items_per_page
-    end = start + items_per_page
-
-    total_pages = (len(posts) + items_per_page - 1) // items_per_page
-    items_on_page = list(posts.keys())[start:end]
-
-    if page > total_pages or page < 1:
+    page, items_on_page, total_pages, posts = notes_controller.set_post(
+        "define_pages", None, None, None
+    )
+    if page > total_pages:
+        return redirect(url_for("blog.home", page=1))
+    elif page < 1:
         return redirect(url_for("blog.home", page=total_pages))
 
     return render_template(
-        "blog/index.html",
+        "blog/home.html",
         posts=posts,
         items_on_page=items_on_page,
         total_pages=total_pages,
         page=page
+    )
+
+
+@bp.route("/search", methods=("GET",))
+def get_search() -> Response:
+    return render_template("blog/search.html", search_result=None)
+
+
+@bp.route("/search", methods=("POST",))
+def search() -> Response:
+    keyword = request.form["search_keyword"]
+    posts_data = notes_controller.get_posts_data()
+
+    search_result = [
+        (post_id, data) for post_id, data
+        in posts_data.items() if keyword in data["title"] or
+        keyword in data["body"]
+    ]
+
+    return render_template("blog/search.html", search_result=search_result)
+
+
+@bp.route("/read-post/<post_id>", methods=("GET",))
+def read_post(post_id) -> Response:
+    if not notes_controller.set_post("validate", post_id):
+        return redirect(url_for("blog.home"))
+
+    return render_template(
+        "blog/read-post.html",
+        post=notes_controller.get_posts_data()[post_id],
     )
 
 
