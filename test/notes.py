@@ -1,7 +1,8 @@
 import json
 from datetime import datetime
 
-from flask import session, request
+import uuid
+from flask import session
 
 import config
 
@@ -13,11 +14,21 @@ class NotesController:
     __slots__ = "posts_path",
 
     def __init__(self) -> None:
-        self.posts_path = config.posts_path
+        self.posts_path: str = config.posts_path
+
+    def __write_data(self, posts_data: dict) -> None:
+        """ Writes data to notes.json file
+
+        Parameters
+        ----------
+        posts_data : dict
+
+        """
+        with open(self.posts_path, "w") as posts_json:
+            json.dump(posts_data, posts_json, indent=2)
 
     def get_posts_data(self) -> dict:
-        """
-        Opens posts json and returns it's loaded data
+        """ Opens posts json and returns it's loaded data
 
         Returns
         -------
@@ -27,120 +38,120 @@ class NotesController:
         with open(self.posts_path, "r") as posts_file:
             return json.load(posts_file)
 
-    def set_post(
-        self,
-        action: str,
-        post_id: str | None,
-        title: str | None = None,
-        body: str | None = None
-    ) -> None | bool | dict | str:
-        """
-        Interface that opens necessary files for needed function and does
-        file manipulations. It's created because we don't want to open
-        a lot of copies of the same file inside different functions.
-
-        Parameters
-        ----------
-        action : str | "create" | "update" | "validate" | "delete" |
-                     | "define_pages"
-        post_id : str | None
-        title : str | None
-        body : str | None
+    def init_pages(self, page: int) -> tuple[int, list, int, dict]:
+        """ Defines pages count, content, current page for application
 
         Returns
         -------
-        None | bool | dict | str
+        tuple[int, list, int, dict]
 
         """
-        with open(self.posts_path, "r+") as posts_json:
-            posts_data = json.load(posts_json)
+        posts: dict = self.get_posts_data()
 
-            return getattr(self, f"{action}_post")(
-                posts_data=posts_data,
-                posts_json=posts_json,
-                post_id=post_id,
-                title=title,
-                body=body
-            )
-
-    def __write_data(self, posts_data: dict, posts_json):
-        posts_json.seek(0)
-        posts_json.truncate()
-        json.dump(posts_data, posts_json, indent=2)
-
-    def define_pages_post(self, **kwargs):
-        posts = kwargs["posts_data"]
-
-        page = request.args.get("page", 1, type=int)
         items_per_page = 10
 
-        start = (page - 1) * items_per_page
-        end = start + items_per_page
+        start: int = (page - 1) * items_per_page
+        end: int = start + items_per_page
 
-        if len(posts) > 0:
-            total_pages = (len(posts) + items_per_page - 1) // items_per_page
-        else:
-            total_pages = 1
-        items_on_page = list(posts.keys())[start:end]
+        total_pages: int = (len(posts) + items_per_page - 1) // items_per_page\
+            if len(posts) > 0 else 1
 
-        return page, items_on_page, total_pages, posts
+        items_on_page: list = list(posts.keys())[start:end]
 
-    def validate_post(self, **kwargs) -> None | dict:
-        """
-        Validates post id when user want to get, delete or update post
+        return items_on_page, total_pages, posts
+
+    def validate_post(
+        self, post_id: str,
+        read_mode: bool = False
+    ) -> dict | None:
+        """ Validates post id for usage. Returns current post if id is valid
+
+        Parameters
+        ----------
+        post_id : str
+        read_mode : bool
 
         Returns
         -------
         dict | None
+
         """
-        if kwargs["post_id"] not in kwargs["posts_data"]:
+        posts_data: dict = self.get_posts_data()
+
+        if post_id not in posts_data:
             return
 
-        current_post = kwargs["posts_data"][kwargs["post_id"]]
+        current_post: dict = posts_data[post_id]
 
-        if session.get("current_user"):
-            if current_post["author_email"] != session["current_user"]:
-                return
+        if (
+            current_post["author_email"] != session.get("current_user")
+            and not read_mode
+        ):
+            return
 
         return current_post
 
-    def delete_post(self, posts_data: dict, posts_json, **kwargs) -> None:
-        """
-        Deletes post by id from database
-        """
+    def delete_post(self, post_id: str) -> None:
+        """ Deletes post by id form database
 
-        del posts_data[kwargs['post_id']]
+        Parameters
+        ----------
+        post_id : str
 
-        self.__write_data(posts_data, posts_json)
+        """
+        posts_data: dict = self.get_posts_data()
+        print(f"-------------{post_id}-----------")
+        del posts_data[post_id]
 
-    def update_post(self, posts_data: dict, posts_json, **kwargs) -> None:
+        self.__write_data(posts_data)
+
+    def update_post(
+        self,
+        post_id: str,
+        title: str,
+        body: str
+    ) -> None:
+        """ Updates post by id
+
+        Parameters
+        ----------
+        post_id : str
+        title : str
+        body : str
+
         """
-        Updates posts_data dict then saves new data
-        """
-        posts_data[kwargs['post_id']].update({
-            "title": kwargs['title'],
-            "body": kwargs['body'],
+        posts_data: dict = self.get_posts_data()
+
+        posts_data[post_id].update({
+            "title": title,
+            "body": body,
             "updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
-        self.__write_data(posts_data, posts_json)
 
-    def create_post(self, posts_data: dict, posts_json, **kwargs) -> None:
+        self.__write_data(posts_data)
+
+    def create_post(
+        self,
+        title: str,
+        body: str
+    ) -> None:
+        """ Creates new post, assigns id to it by using uuid4
+
+        Parameters
+        ----------
+        title : str
+        body : str
+
         """
-        Creates new key value pair where value have all necessary data
-        about post then saves it to database
-        """
-        if not posts_data:
-            post_id = "1"
-        else:
-            key, post = posts_data.popitem()
-            posts_data[key] = post  # I took last key by pop then restored dict
-            post_id = str(int(key) + 1)
+        posts_data: dict = self.get_posts_data()
+        post_id: str = str(uuid.uuid4())
 
         posts_data[post_id] = {
-            "title": kwargs['title'],
-            "body": kwargs['body'],
+            "title": title,
+            "body": body,
             "author": session["username"],
             "author_email": session["current_user"],
             "created": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
-        self.__write_data(posts_data, posts_json)
+
+        self.__write_data(posts_data)

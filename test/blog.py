@@ -10,8 +10,6 @@ from flask import (
 from auth import login_required
 from notes import NotesController
 
-
-notes_controller = NotesController()
 bp = Blueprint("blog", __name__)
 
 
@@ -38,13 +36,12 @@ def home() -> Response:
     Response
 
     """
-    page, items_on_page, total_pages, posts = notes_controller.set_post(
-        "define_pages", None, None, None
-    )
-    if page > total_pages:
+    page: int = request.args.get("page", 1, type=int)
+
+    items_on_page, total_pages, posts = NotesController().init_pages(page)
+
+    if page > total_pages or page < 1:
         return redirect(url_for("blog.home", page=1))
-    elif page < 1:
-        return redirect(url_for("blog.home", page=total_pages))
 
     return render_template(
         "blog/home.html",
@@ -63,25 +60,28 @@ def get_search() -> Response:
 @bp.route("/search", methods=("POST",))
 def search() -> Response:
     keyword = request.form["search_keyword"]
-    posts_data = notes_controller.get_posts_data()
 
-    search_result = [
-        (post_id, data) for post_id, data
-        in posts_data.items() if keyword in data["title"] or
-        keyword in data["body"]
-    ]
+    posts_data = NotesController().get_posts_data()
 
-    return render_template("blog/search.html", search_result=search_result)
+    return render_template(
+        "blog/search.html",
+        search_result=enumerate([
+            element for element in posts_data.items()
+            if keyword in element[1]["title"] or
+            keyword in element[1]["body"]
+        ])
+    )
 
 
 @bp.route("/read-post/<post_id>", methods=("GET",))
 def read_post(post_id) -> Response:
-    if not notes_controller.set_post("validate", post_id):
+
+    if not (current_post := NotesController().validate_post(post_id, True)):
         return redirect(url_for("blog.home"))
 
     return render_template(
         "blog/read-post.html",
-        post=notes_controller.get_posts_data()[post_id],
+        post=current_post,
     )
 
 
@@ -111,21 +111,14 @@ def create_post() -> Response:
     Response
 
     """
-    title = request.form["title"]
 
-    if not title:
-
+    if not (title := request.form["title"]):
         return render_template(
             "blog/create.html",
             error="Title is required"
         )
 
-    notes_controller.set_post(
-        "create",
-        None,
-        title,
-        request.form["body"]
-    )
+    NotesController().create_post(title, request.form["body"])
 
     return redirect(url_for("blog.home"))
 
@@ -146,12 +139,12 @@ def get_update_post(post_id: str) -> Response:
     Response
 
     """
-    if not notes_controller.set_post("validate", post_id):
+    if not (current_post := NotesController().validate_post(post_id)):
         return redirect(url_for("blog.home"))
 
     return render_template(
         "blog/update.html",
-        post=notes_controller.set_post("validate", post_id),
+        post=current_post,
         post_id=post_id
     )
 
@@ -171,7 +164,7 @@ def update_post(post_id: str) -> Response:
     Response
 
     """
-    if not notes_controller.set_post("validate", post_id):
+    if not (current_post := NotesController().validate_post(post_id)):
         return redirect(url_for("blog.home", page_id="1"))
 
     title = request.form["title"]
@@ -179,17 +172,12 @@ def update_post(post_id: str) -> Response:
     if not title:
         return render_template(
             "blog/update.html",
-            current_post=notes_controller.set_post("validate", post_id),
+            current_post=current_post,
             post_id=post_id,
             error="Title is required"
         )
 
-    notes_controller.set_post(
-        "update",
-        post_id,
-        title,
-        request.form["body"]
-    )
+    NotesController().update_post(post_id, title, request.form["body"])
 
     return redirect(url_for("blog.home"))
 
@@ -209,9 +197,10 @@ def delete_post(post_id: str) -> Response:
     Response
 
     """
-    if not notes_controller.set_post("validate", post_id):
+    if not NotesController().validate_post(post_id):
+
         return redirect(url_for("blog.home", page_id="1"))
 
-    notes_controller.set_post("delete", post_id)
+    NotesController().delete_post(post_id)
 
     return redirect(url_for("index"))

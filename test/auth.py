@@ -13,7 +13,6 @@ from flask import (
 
 from users import Users
 
-users = Users()
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
@@ -44,10 +43,10 @@ def register() -> Response:
     Response
 
     """
-    if error := users.set_account(request.form, mode="registration"):
+    if error := Users().set_account(request.form, mode="registration"):
         return render_template("auth/register.html", error=error)
 
-    users.set_account(request.form, mode="reg_new_acc")
+    Users().set_account(request.form, mode="reg_new_acc")
 
     return redirect(url_for("auth.login"))
 
@@ -82,7 +81,7 @@ def login() -> Response:
     """
     email = request.form["email"]
 
-    error, users_data = users.set_account(request.form, mode="login")
+    error, users_data = Users().set_account(request.form, mode="login")
 
     if error:
         return render_template("auth/login.html", error=error)

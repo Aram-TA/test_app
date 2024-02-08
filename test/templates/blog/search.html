@@ -24,9 +24,9 @@
 
 			{% if search_result %}
 			<div id="result">
-				{% for post_id, data in search_result %}
+				{% for index, (post_id, data) in search_result %}
 				<div id="title">
-					<p style="flex-basis: 70%;">{{ post_id }}:&nbsp{{ data['title'] }}</p>
+					<p style="flex-basis: 70%;">{{ index }}:&nbsp{{ data['title'] }}</p>
 					{% if data['body'] %}
 					<a href="{{ url_for('blog.read_post', post_id=post_id) }}">
 						ReadPost
