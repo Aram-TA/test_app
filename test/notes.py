@@ -38,12 +38,16 @@ class NotesController:
         with open(self.posts_path, "r") as posts_file:
             return json.load(posts_file)
 
-    def init_pages(self, page: int) -> tuple[int, list, int, dict]:
+    def init_pages(self, page: int) -> tuple[list, int, dict]:
         """ Defines pages count, content, current page for application
+
+        Parameters
+        ----------
+        page : int
 
         Returns
         -------
-        tuple[int, list, int, dict]
+        tuple[list, int, dict]
 
         """
         posts: dict = self.get_posts_data()
@@ -61,7 +65,8 @@ class NotesController:
         return items_on_page, total_pages, posts
 
     def validate_post(
-        self, post_id: str,
+        self,
+        post_id: str,
         read_mode: bool = False
     ) -> dict | None:
         """ Validates post id for usage. Returns current post if id is valid
@@ -100,7 +105,7 @@ class NotesController:
 
         """
         posts_data: dict = self.get_posts_data()
-        print(f"-------------{post_id}-----------")
+
         del posts_data[post_id]
 
         self.__write_data(posts_data)

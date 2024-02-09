@@ -15,8 +15,7 @@ bp = Blueprint("blog", __name__)
 
 @bp.route("/")
 def index() -> Response:
-    """
-    Redirects to home when client goes to "/" url
+    """ Redirects to home when client goes to "/" url
 
     Returns
     -------
@@ -28,8 +27,7 @@ def index() -> Response:
 
 @bp.route("/home", methods=("GET",))
 def home() -> Response:
-    """
-    Returns rendered home template when client goes to "/" url
+    """ Returns rendered home template when client goes to "/" url
 
     Returns
     -------
@@ -37,6 +35,10 @@ def home() -> Response:
 
     """
     page: int = request.args.get("page", 1, type=int)
+
+    items_on_page: list[str]
+    total_pages: int
+    posts: dict
 
     items_on_page, total_pages, posts = NotesController().init_pages(page)
 
@@ -54,13 +56,27 @@ def home() -> Response:
 
 @bp.route("/search", methods=("GET",))
 def get_search() -> Response:
+    """ Renders search page.
+
+    Returns
+    -------
+    Response
+
+    """
     return render_template("blog/search.html", search_result=None)
 
 
 @bp.route("/search", methods=("POST",))
 def search() -> Response:
-    keyword = request.form["search_keyword"]
-    posts_data = NotesController().get_posts_data()
+    """ Searches necessary data in posts database, renders what it found
+
+    Returns
+    -------
+    Response
+
+    """
+    keyword: str = request.form["search_keyword"]
+    posts_data: dict = NotesController().get_posts_data()
 
     return render_template(
         "blog/search.html",
@@ -72,7 +88,19 @@ def search() -> Response:
 
 
 @bp.route("/read-post/<post_id>", methods=("GET",))
-def read_post(post_id) -> Response:
+def read_post(post_id: str) -> Response:
+    """ Renders special page for current post reading.
+
+    Parameters
+    ----------
+    post_id : str
+
+    Returns
+    -------
+    Response
+
+    """
+    current_post: dict | None
 
     if not (current_post := NotesController().validate_post(post_id, True)):
         return redirect(url_for("blog.home"))
@@ -86,29 +114,28 @@ def read_post(post_id) -> Response:
 @bp.route("/create", methods=("GET",))
 @login_required
 def get_create_post() -> Response:
-    """
-    Renders post creating html for our server.
+    """ Renders post creating html for our server.
 
     Returns
     -------
     Response
 
     """
-    return render_template("blog/create.html")
+    return render_template("blog/create.html", error=None)
 
 
 @bp.route("/create", methods=("POST",))
 @login_required
 def create_post() -> Response:
-    """
-    Does validations for post creating process then writes new data by using
-    NotesController. Then redirects to index if everything is OK.
+    """ Does validations for post creating process then writes new data
+        by using NotesController. Then redirects to index if everything is OK.
 
     Returns
     -------
     Response
 
     """
+    title: str | None
 
     if not (title := request.form["title"]):
         return render_template(
@@ -143,7 +170,8 @@ def get_update_post(post_id: str) -> Response:
     return render_template(
         "blog/update.html",
         post=current_post,
-        post_id=post_id
+        post_id=post_id,
+        error=None
     )
 
 
@@ -164,7 +192,8 @@ def update_post(post_id: str) -> Response:
     """
     notes_controller = NotesController()
 
-    title = request.form["title"]
+    title: str | None = request.form["title"]
+    current_post: dict | None
 
     if current_post := notes_controller.validate_post(post_id):
         notes_controller.update_post(post_id, title, request.form["body"])

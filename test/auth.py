@@ -18,25 +18,20 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 @bp.route("/register", methods=("GET",))
 def get_register() -> Response:
-    """
-    Renders register template
+    """ Renders register template
 
     Returns
     -------
     Response
 
     """
-    return render_template("auth/register.html")
+    return render_template("auth/register.html", error=None)
 
 
 @bp.route("/register", methods=("POST",))
 def register() -> Response:
-    """
-    Does some validation for registration then if it succeed redirects to login
-
-    Parameters
-    -----------
-    None
+    """ Does some validation for registration
+        then if it succeed redirects to login
 
     Returns
     -------
@@ -55,33 +50,30 @@ def register() -> Response:
 
 @bp.route("/login", methods=("GET",))
 def get_login() -> Response:
-    """
-    Renders login template
+    """ Renders login template
 
     Returns
     -------
     Response
 
     """
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", error=None)
 
 
 @bp.route("/login", methods=("POST",))
 def login() -> Response:
-    """
-    Does some validation for login then if it succeed redirects to index page
-    Also handles current session of logged in user
-
-    Parameters
-    -----------
-    None
+    """ Does some validation for login then if it succeed redirects
+        to index page. Also handles current session of logged in user
 
     Returns
     -------
     Response
 
     """
-    email = request.form["email"]
+    email: str = request.form["email"]
+
+    error: str | None
+    users_data: dict
 
     error, users_data = Users().validate_login(request.form)
 
@@ -97,9 +89,8 @@ def login() -> Response:
 
 
 def login_required(view: Callable) -> Callable:
-    """
-    Decorator that checks is user logged in or not
-    if not redirects to login page
+    """ Decorator that checks is user logged in or not
+        if not redirects to login page
 
     Parameters
     -----------
@@ -124,12 +115,7 @@ def login_required(view: Callable) -> Callable:
 @bp.route("/logout")
 @login_required
 def logout() -> Response:
-    """
-    Clears all data of current flask session and redirects to index page
-
-    Parameters
-    -----------
-    None
+    """ Clears all data of current flask session and redirects to index page
 
     Returns
     -------
