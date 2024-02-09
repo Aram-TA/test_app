@@ -43,10 +43,12 @@ def register() -> Response:
     Response
 
     """
-    if error := Users().set_account(request.form, mode="registration"):
+    users = Users()
+
+    if error := users.validate_registration(request.form):
         return render_template("auth/register.html", error=error)
 
-    Users().set_account(request.form, mode="reg_new_acc")
+    users.reg_new_acc(request.form)
 
     return redirect(url_for("auth.login"))
 
@@ -81,7 +83,7 @@ def login() -> Response:
     """
     email = request.form["email"]
 
-    error, users_data = Users().set_account(request.form, mode="login")
+    error, users_data = Users().validate_login(request.form)
 
     if error:
         return render_template("auth/login.html", error=error)
@@ -91,25 +93,7 @@ def login() -> Response:
     session["current_user"] = email
     session["username"] = users_data[email]["username"]
 
-    return redirect(url_for("index"))
-
-
-@bp.route("/logout")
-def logout() -> Response:
-    """
-    Clears all data of current flask session and redirects to index page
-
-    Parameters
-    -----------
-    None
-
-    Returns
-    -------
-    Response
-
-    """
-    session.clear()
-    return redirect(url_for("index"))
+    return redirect(url_for("blog.home"))
 
 
 def login_required(view: Callable) -> Callable:
@@ -135,3 +119,22 @@ def login_required(view: Callable) -> Callable:
         return view(**kwargs)
 
     return wrapped_view
+
+
+@bp.route("/logout")
+@login_required
+def logout() -> Response:
+    """
+    Clears all data of current flask session and redirects to index page
+
+    Parameters
+    -----------
+    None
+
+    Returns
+    -------
+    Response
+
+    """
+    session.clear()
+    return redirect(url_for("blog.home"))

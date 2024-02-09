@@ -16,40 +16,33 @@ class Users:
     def __init__(self) -> None:
         self.users_path = config.users_path
 
-    def set_account(self, request_form: dict, mode: str) -> tuple | str | None:
-        """
-        Interface that opens necessary files for needed function and does
-        selected validation. It's created because we don't want to open
-        a lot of copies of the same file inside different functions
+    def __write_data(self, users_data: dict) -> None:
+        """ Writes data to notes.json file
 
         Parameters
         ----------
-        request_form : dict
-        mode : str
+        posts_data : dict
+
+        """
+        with open(self.users_path, "w") as posts_json:
+            json.dump(users_data, posts_json, indent=2)
+
+    def __get_data(self) -> dict:
+        """ Opens posts json and returns it's loaded data
 
         Returns
         -------
-        str | None
+        dict
 
         """
-        with open(self.users_path, "r+") as users_json:
-            user_data = json.load(users_json)
+        with open(self.users_path, "r") as users_file:
+            return json.load(users_file)
 
-            return getattr(self, f"validate_{mode}")(
-                request_form=request_form,
-                user_data=user_data,
-                users_json=users_json
-            )
-
-    def validate_reg_new_acc(self, **kwargs) -> None:
+    def reg_new_acc(self, request_form: dict) -> None:
         """
         Inserts new account values to database
         """
-        users_json = kwargs["users_json"]
-        user_data = kwargs["user_data"]
-        request_form = kwargs["request_form"]
-
-        users_json.seek(0)
+        user_data: dict = self.__get_data()
 
         user_data[request_form["email"]] = {
             "phone_number": request_form["phone_number"],
@@ -57,9 +50,9 @@ class Users:
             "password": generate_password_hash(request_form["password"]),
         }
 
-        json.dump(user_data, users_json, indent=2)
+        self.__write_data(user_data)
 
-    def validate_login(self, **kwargs) -> tuple:
+    def validate_login(self, request_form: dict) -> tuple:
         """
         Validates user login by using existing password and email.
         Also gives back user data for use to routing function
@@ -71,9 +64,7 @@ class Users:
         """
         error = None
         text = "User with that email not found or Incorrect password"
-
-        request_form = kwargs["request_form"]
-        user_data = kwargs["user_data"]
+        user_data = self.__get_data()
         email = request_form["email"]
 
         if email not in user_data:
@@ -88,7 +79,7 @@ class Users:
 
         return error, user_data
 
-    def validate_registration(self, **kwargs) -> None | str:
+    def validate_registration(self, request_form: dict) -> None | str:
         """
         Validates registration by using some functions above
         If we have some errors in validation we will receive error as string
@@ -98,9 +89,9 @@ class Users:
         str | None
 
         """
-        request_form = kwargs['request_form']
+        user_data = self.__get_data()
 
-        if request_form["email"] in kwargs["user_data"]:
+        if request_form["email"] in user_data:
             return "That user already exists."
 
         if request_form['password'] != request_form['password_repeat']:

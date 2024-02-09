@@ -60,15 +60,13 @@ def get_search() -> Response:
 @bp.route("/search", methods=("POST",))
 def search() -> Response:
     keyword = request.form["search_keyword"]
-
     posts_data = NotesController().get_posts_data()
 
     return render_template(
         "blog/search.html",
         search_result=enumerate([
-            element for element in posts_data.items()
-            if keyword in element[1]["title"] or
-            keyword in element[1]["body"]
+            (post_id, data) for post_id, data in posts_data.items()
+            if keyword in data["title"] or keyword in data["body"]
         ])
     )
 
@@ -164,10 +162,12 @@ def update_post(post_id: str) -> Response:
     Response
 
     """
-    if not (current_post := NotesController().validate_post(post_id)):
-        return redirect(url_for("blog.home", page_id="1"))
+    notes_controller = NotesController()
 
     title = request.form["title"]
+
+    if current_post := notes_controller.validate_post(post_id):
+        notes_controller.update_post(post_id, title, request.form["body"])
 
     if not title:
         return render_template(
@@ -176,8 +176,6 @@ def update_post(post_id: str) -> Response:
             post_id=post_id,
             error="Title is required"
         )
-
-    NotesController().update_post(post_id, title, request.form["body"])
 
     return redirect(url_for("blog.home"))
 
@@ -197,10 +195,9 @@ def delete_post(post_id: str) -> Response:
     Response
 
     """
-    if not NotesController().validate_post(post_id):
+    notes_controller = NotesController()
 
-        return redirect(url_for("blog.home", page_id="1"))
+    if notes_controller.validate_post(post_id):
+        notes_controller.delete_post(post_id)
 
-    NotesController().delete_post(post_id)
-
-    return redirect(url_for("index"))
+    return redirect(url_for("blog.home"))
