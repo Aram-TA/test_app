@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html id="html5" lang="en">
 
 <head>
 	<meta charset="UTF-8">
@@ -13,7 +13,7 @@
 	<header>
 		<h1 id="header">{{ post["title"] }}</h1>
 		<nav>
-			<a href="{{ url_for('blog.home') }}">Go Home</a>
+			<a id="goHome" href="{{ url_for('blog.home') }}">Go Home</a>
 		</nav>
 	</header>
 	<main>
@@ -21,5 +21,4 @@
 	</main>
 	</div>
 	</body>
-
 </html>
