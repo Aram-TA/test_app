@@ -1,53 +1,61 @@
-const readPost = async function(event) {
+function disableScroll() {
+    document.body.style.overflow = 'hidden';
+}
+
+function enableScroll() {
+    document.body.style.overflow = '';
+}
+
+const openWindow = async function(event) {
     event.preventDefault();
     try {
         const response = await fetch(event.target.getAttribute('href'));
-        if (!response.ok) {
-            throw new Error('Failed to fetch.')
-        }
-
-        const content = await response.text();
-        document.getElementById('html5').innerHTML = content;
-        await changeGoHome();
-
-    } catch (error) {
-        throw new Error(error);
-    }
-}
-
-const changeReadPost = async function() {
-    const readingLinks = document.querySelectorAll('a.reading');
-    readingLinks.forEach(link => link.addEventListener("click", readPost));
-}
-
-const goHome = async function(event) {
-    try {
-        event.preventDefault();
-        const response = await fetch(window.location.href);
 
         if (!response.ok) {
             throw new Error('Failed to fetch.');
         }
 
         const content = await response.text();
-        document.getElementById('html5').innerHTML = content;
-        await changeReadPost();
+        const element = document.getElementById('readPost');
+        element.innerHTML = content;
+        element.style.display = "flex";
+        disableScroll();
+        await addEventToClose();
 
     } catch (error) {
         throw new Error(error);
     }
 }
 
-const changeGoHome = async function() {
-    document.getElementById('goHome').addEventListener('click', goHome);
-    console.log("listener added");
+const addEventToReadPost = async function() {
+    const readingLinks = document.querySelectorAll('a.reading');
+    readingLinks.forEach(link => link.addEventListener("click", openWindow));
 }
 
+const closeWindow = async function(event) {
+    try {
+        event.preventDefault();
+
+        const element = document.getElementById('readPost');
+        element.style.display = "none";
+        element.innerHTML = "";
+        enableScroll();
+        await addEventToReadPost();
+
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+const addEventToClose = async function() {
+    document.getElementById('close').addEventListener('click', closeWindow);
+}
 
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await changeReadPost();
+        await addEventToReadPost();
+
     } catch(error) {
         console.error(error);
     }

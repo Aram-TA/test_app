@@ -1,24 +1,7 @@
-<!DOCTYPE html>
-<html id="html5" lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Read Post {{ post["title"] }}</title>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/read-post.css') }}">
-</head>
-
-<body>
-	<div id="content">
-	<header>
-		<h1 id="header">{{ post["title"] }}</h1>
-		<nav>
-			<a id="goHome" href="{{ url_for('blog.home') }}">Go Home</a>
-		</nav>
-	</header>
-	<main>
-		<p>{{ post["body"] }}</p>
-	</main>
+<article id="rpContent">
+	<div id="rpHeader">
+		<div id="rpNav"><a id="close" href="{{ url_for('blog.home') }}">Go Home</a></div>
+		<h1 id="rpH1">{{ post["title"] }}</h1>
 	</div>
-	</body>
-</html>
+	<p id="rpText">{{ post["body"] }}</p>
+</article>
