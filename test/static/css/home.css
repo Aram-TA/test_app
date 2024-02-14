@@ -129,7 +129,7 @@ nav h1 {
 #rpText{
   box-sizing: content-box;
   height: 65%;
-  margin-bottom: 0;
+  margin-bottom: 1.5em;
   margin-left: 1em;
   margin-right: 1em;
   text-align: left;
