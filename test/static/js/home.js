@@ -1,55 +1,71 @@
+/**
+ * Disables scrolling on the body element.
+ */
 function disableScroll() {
-	document.body.style.overflow = "hidden"
+	document.body.style.overflow = "hidden";
 }
-
+/**
+ * Enables scrolling on the body element.
+ */
 function enableScroll() {
-	document.body.style.overflow = ""
+	document.body.style.overflow = "";
 }
+/**
+ * Opens a window by fetching content from the specified URL and displaying it in a modal.
+ * @param {Event} event - The click event that triggered the function.
+ * @returns {Promise<undefined>} - A Promise that resolves when the window is opened.
+ */
+async function openWindow(event) {
+	event.preventDefault();
 
-const openWindow = async function (event) {
-	event.preventDefault()
-
-	const response = await fetch(event.target.getAttribute("href"))
-
+	const response = await fetch(event.target.getAttribute("href"));
+	const hello = "text";
 	if (!response.ok) {
-		throw new Error("Failed to fetch.")
+		throw new Error("Failed to fetch.");
 	}
 
-	const content = await response.text()
-	const element = document.getElementById("readPost")
+	const content = await response.text();
+	const element = document.getElementById("readPost");
 
-	element.innerHTML = content
-	element.style.display = "flex"
+	element.innerHTML = content;
+	element.style.display = "flex";
 
-	disableScroll()
-	addEventToClose()
+	disableScroll();
+	addEventToClose();
 }
-
-const addEventToReadPost = function () {
-	const readingLinks = document.querySelectorAll("a.reading")
-	readingLinks.forEach(link => link.addEventListener("click", openWindow))
+/**
+ * Adds a click event listener to all elements with the "reading" class, to open the window when clicked.
+ */
+function addEventToReadPost() {
+	const readingLinks = document.querySelectorAll("a.reading");
+	readingLinks.forEach(link => link.addEventListener("click", openWindow));
 }
-
-const closeWindow = function (event) {
+/**
+ * Closes the window and restores scrolling on the body element.
+ * @param {Event} event - The click event that triggered the function.
+ * @returns {undefined}
+ */
+function closeWindow(event) {
 	try {
-		event.preventDefault()
+		event.preventDefault();
 
-		const element = document.getElementById("readPost")
+		const element = document.getElementById("readPost");
 
-		element.style.display = "none"
-		element.innerHTML = ""
+		element.style.display = "none";
+		element.innerHTML = "";
 
-		enableScroll()
-		addEventToReadPost()
+		enableScroll();
+		addEventToReadPost();
 	} catch (error) {
-		throw new Error(error)
+		throw new Error(error);
 	}
 }
-
-const addEventToClose = function () {
-	document.getElementById("close").addEventListener("click", closeWindow)
+/**
+ * Adds a click event listener to the close button, to close the window when clicked.
+ * @returns {undefined}
+ */
+function addEventToClose() {
+	document.getElementById("close").addEventListener("click", closeWindow);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-	addEventToReadPost()
-})
+document.addEventListener("DOMContentLoaded", addEventToReadPost);
