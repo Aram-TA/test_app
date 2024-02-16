@@ -7,6 +7,7 @@ from flask import (
     render_template,
 )
 
+from searcher import Searcher
 from auth import login_required
 from notes import NotesController
 
@@ -36,18 +37,16 @@ def home() -> Response:
     """
     page: int = request.args.get("page", 1, type=int)
 
-    items_on_page: list[str]
+    items_on_page: list
     total_pages: int
-    posts: dict
 
-    items_on_page, total_pages, posts = NotesController().init_pages(page)
+    items_on_page, total_pages = NotesController().init_pages(page)
 
     if page > total_pages or page < 1:
         return redirect(url_for("blog.home", page=1))
 
     return render_template(
         "blog/home.html",
-        posts=posts,
         items_on_page=items_on_page,
         total_pages=total_pages,
         page=page
@@ -76,14 +75,11 @@ def search() -> Response:
 
     """
     keyword: str = request.form["search_keyword"]
-    posts_data: dict = NotesController().get_posts_data()
+    search_result = Searcher().search_by_title_or_body(keyword)
 
     return render_template(
         "blog/search.html",
-        search_result=enumerate([
-            (post_id, data) for post_id, data in posts_data.items()
-            if keyword in data["title"] or keyword in data["body"]
-        ])
+        search_result=search_result
     )
 
 
@@ -138,10 +134,7 @@ def create_post() -> Response:
     title: str | None
 
     if not (title := request.form["title"]):
-        return render_template(
-            "blog/create.html",
-            error="Title is required"
-        )
+        return render_template("blog/create.html", error="Title is required")
 
     NotesController().create_post(title, request.form["body"])
 
@@ -196,15 +189,19 @@ def update_post(post_id: str) -> Response:
     current_post: dict | None
 
     if current_post := notes_controller.validate_post(post_id):
-        notes_controller.update_post(post_id, title, request.form["body"])
-
-    if not title:
-        return render_template(
-            "blog/update.html",
-            current_post=current_post,
-            post_id=post_id,
-            error="Title is required"
-        )
+        if (
+            error := notes_controller.update_post(
+                post_id,
+                title,
+                request.form["body"]
+            )
+        ):
+            return render_template(
+                "blog/update.html",
+                current_post=current_post,
+                post_id=post_id,
+                error=error
+            )
 
     return redirect(url_for("blog.home"))
 

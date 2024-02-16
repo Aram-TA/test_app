@@ -1,26 +1,8 @@
-import os
-
 from flask import Flask
 
 import blog
 import auth
-import config
-
-
-def init_files():
-    """
-    Creates all necessary files for file system.
-    """
-    if not os.path.exists("data"):
-        os.mkdir("data")
-
-    if not os.path.exists(config.users_path):
-        with open(config.users_path, "w") as users_file:
-            users_file.write("{}")
-
-    if not os.path.exists(config.posts_path):
-        with open(config.posts_path, "w") as posts_file:
-            posts_file.write("{}")
+from dataBase import init_notes_table, init_users_table
 
 
 def app_constructor(test_config: dict = {}) -> None:
@@ -48,10 +30,14 @@ def app_constructor(test_config: dict = {}) -> None:
     app.register_blueprint(auth.bp)
     app.register_blueprint(blog.bp)
     app.add_url_rule("/", endpoint="index")
+
     return app
 
 
 if __name__ == "__main__":
-    init_files()
     app = app_constructor()
+
+    init_users_table(app)
+    init_notes_table(app)
+
     app.run(debug=True)

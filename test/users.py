@@ -1,39 +1,14 @@
 import re
-import json
 from string import ascii_lowercase, ascii_uppercase, digits
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-import config
+
+from dataBase import get_db
 
 
 class Users:
-    __slots__ = "users_path",
-
-    def __init__(self) -> None:
-        self.users_path = config.users_path
-
-    def __write_data(self, users_data: dict) -> None:
-        """ Writes data to users.json
-
-        Parameters
-        ----------
-        users_data : dict
-
-        """
-        with open(self.users_path, "w") as posts_json:
-            json.dump(users_data, posts_json, indent=2)
-
-    def __get_data(self) -> dict:
-        """ Opens posts json and returns it's loaded data
-
-        Returns
-        -------
-        dict
-
-        """
-        with open(self.users_path, "r") as users_file:
-            return json.load(users_file)
+    __slots__ = ()
 
     def reg_new_acc(self, request_form: dict) -> None:
         """ Registers new account data to database
@@ -43,15 +18,20 @@ class Users:
         request_form : dict
 
         """
-        user_data: dict = self.__get_data()
-
-        user_data[request_form["email"]] = {
-            "phone_number": request_form["phone_number"],
-            "username": request_form["username"],
-            "password": generate_password_hash(request_form["password"]),
-        }
-
-        self.__write_data(user_data)
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(
+            '''INSERT INTO users (email, phone_number, username, password)
+            VALUES (?, ?, ?, ?)''',
+            (
+                request_form["email"],
+                request_form["phone_number"],
+                request_form["username"],
+                generate_password_hash(request_form["password"])
+            )
+        )
+        cursor.close()
+        db.commit()
 
     def validate_login(self, request_form: dict) -> tuple:
         """ Validates user login by using existing password and email.
@@ -63,25 +43,36 @@ class Users:
 
         Returns
         -------
-        tuple
+        str | None
 
         """
         error: None | str = None
-        text: str = "User with that email not found or Incorrect password"
-        user_data: dict = self.__get_data()
+
         email: str = request_form["email"]
+        text: str = "User with that email not found or Incorrect password"
 
-        if email not in user_data:
+        cursor = get_db().cursor()
+
+        if not cursor.execute(
+            'SELECT id FROM users WHERE email = ?',
+            (email,)
+        ).fetchone():
             error = text
 
-        elif not check_password_hash(
-            user_data[email]["password"],
-            request_form["password"]
-        ) or email not in user_data:
+        else:
+            password_hash = cursor.execute(
+                'SELECT password FROM users WHERE email = ?',
+                (email,)
+            ).fetchone()[0]
 
-            error = text
+            if not check_password_hash(
+                password_hash,
+                request_form["password"]
+            ):
+                error = text
 
-        return error, user_data
+        cursor.close()
+        return error
 
     def validate_registration(self, request_form: dict) -> None | str:
         """ Validates registration by using some functions above
@@ -96,11 +87,18 @@ class Users:
         None | str
 
         """
-        user_data: dict = self.__get_data()
+        # Sqlite cursor doesn't support `with` context manager :(
+        cursor = get_db().cursor()
 
-        if request_form["email"] in user_data:
-            return "That user already exists."
+        if cursor.execute(
+            'SELECT id FROM users WHERE email = ? or phone_number = ?',
+            (request_form["email"], request_form["phone_number"])
+        ).fetchone():
 
+            cursor.close()  # So I have to do close manually
+            return "That email or phone number already exists."
+
+        cursor.close()
         if request_form['password'] != request_form['password_repeat']:
             return "Passwords in both fields should be same."
 

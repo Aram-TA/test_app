@@ -12,6 +12,7 @@ from flask import (
 )
 
 from users import Users
+from dataBase import get_db
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -70,21 +71,23 @@ def login() -> Response:
     Response
 
     """
-    email: str = request.form["email"]
-
     error: str | None
-    users_data: dict
 
-    error, users_data = Users().validate_login(request.form)
+    error = Users().validate_login(request.form)
 
     if error:
         return render_template("auth/login.html", error=error)
 
+    cursor = get_db().cursor()
+
+    cursor.execute(
+        'SELECT id, username FROM users WHERE email = ?',
+        (request.form['email'],)
+    )
     session.clear()
+    session["current_user"], session["username"] = cursor.fetchone()
 
-    session["current_user"] = email
-    session["username"] = users_data[email]["username"]
-
+    cursor.close()
     return redirect(url_for("blog.home"))
 
 

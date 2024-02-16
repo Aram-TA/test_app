@@ -11,15 +11,17 @@ function enableScroll() {
 	document.body.style.overflow = "";
 }
 /**
- * Opens a window by fetching content from the specified URL and displaying it in a modal.
+ * Opens a window by fetching content from the specified URL and displaying 
+ * it in a modal.
  * @param {Event} event - The click event that triggered the function.
- * @returns {Promise<undefined>} - A Promise that resolves when the window is opened.
+ * @returns {Promise<undefined>} - A Promise that resolves when the window
+ *  is opened.
  */
 async function openWindow(event) {
 	event.preventDefault();
 
 	const response = await fetch(event.target.getAttribute("href"));
-	const hello = "text";
+
 	if (!response.ok) {
 		throw new Error("Failed to fetch.");
 	}
@@ -34,7 +36,8 @@ async function openWindow(event) {
 	addEventToClose();
 }
 /**
- * Adds a click event listener to all elements with the "reading" class, to open the window when clicked.
+ * Adds a click event listener to all elements with the "reading" class,
+ * to open the window when clicked.
  */
 function addEventToReadPost() {
 	const readingLinks = document.querySelectorAll("a.reading");
@@ -61,7 +64,8 @@ function closeWindow(event) {
 	}
 }
 /**
- * Adds a click event listener to the close button, to close the window when clicked.
+ * Adds a click event listener to the close button,
+ * to close the window when clicked.
  * @returns {undefined}
  */
 function addEventToClose() {
