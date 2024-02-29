@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-02-28T13:58:22.749Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0" etag="IANCu8g5EPfA8P7e5z7H" version="23.1.7" type="github">
+<mxfile host="app.diagrams.net" modified="2024-02-29T07:02:22.218Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0" etag="6ovvT7x4YNfR7qv_Z2oQ" version="23.1.7" type="github">
   <diagram id="R2lEEEUBdFMjLlhIrx00" name="Page-1">
-    <mxGraphModel dx="2537" dy="929" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0" extFonts="Permanent Marker^https://fonts.googleapis.com/css?family=Permanent+Marker">
+    <mxGraphModel dx="2762" dy="1053" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0" extFonts="Permanent Marker^https://fonts.googleapis.com/css?family=Permanent+Marker">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -41,7 +41,7 @@
             <mxRectangle width="30" height="30" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="dOVWwTzUJoapFZF-kY8Z-20" value="phone_number INT UNIQUE" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-18" vertex="1">
+        <mxCell id="dOVWwTzUJoapFZF-kY8Z-20" value="phone_number VARCHAR UNIQUE" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-18" vertex="1">
           <mxGeometry x="30" width="270" height="30" as="geometry">
             <mxRectangle width="270" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -161,13 +161,13 @@
             <mxRectangle width="30" height="30" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="dOVWwTzUJoapFZF-kY8Z-51" value="state VARCHAR" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-49" vertex="1">
+        <mxCell id="dOVWwTzUJoapFZF-kY8Z-51" value="state VARCHAR NOT NULL" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-49" vertex="1">
           <mxGeometry x="30" width="170" height="30" as="geometry">
             <mxRectangle width="170" height="30" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
         <mxCell id="dOVWwTzUJoapFZF-kY8Z-109" value="Tasks" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;" parent="1" vertex="1">
-          <mxGeometry x="560" y="90" width="350" height="300" as="geometry" />
+          <mxGeometry x="560" y="90" width="350" height="270" as="geometry" />
         </mxCell>
         <mxCell id="dOVWwTzUJoapFZF-kY8Z-110" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;" parent="dOVWwTzUJoapFZF-kY8Z-109" vertex="1">
           <mxGeometry y="30" width="350" height="30" as="geometry" />
@@ -242,7 +242,7 @@
             <mxRectangle width="30" height="30" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="dOVWwTzUJoapFZF-kY8Z-133" value="created DATE" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-131" vertex="1">
+        <mxCell id="dOVWwTzUJoapFZF-kY8Z-133" value="created DATE NOT NULL" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-131" vertex="1">
           <mxGeometry x="30" width="320" height="30" as="geometry">
             <mxRectangle width="320" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -269,19 +269,6 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="dOVWwTzUJoapFZF-kY8Z-139" value="state VARCHAR NOT NULL" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-137" vertex="1">
-          <mxGeometry x="30" width="320" height="30" as="geometry">
-            <mxRectangle width="320" height="30" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="dOVWwTzUJoapFZF-kY8Z-189" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;" parent="dOVWwTzUJoapFZF-kY8Z-109" vertex="1">
-          <mxGeometry y="270" width="350" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="dOVWwTzUJoapFZF-kY8Z-190" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-189" vertex="1">
-          <mxGeometry width="30" height="30" as="geometry">
-            <mxRectangle width="30" height="30" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="dOVWwTzUJoapFZF-kY8Z-191" value="last_modification" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-189" vertex="1">
           <mxGeometry x="30" width="320" height="30" as="geometry">
             <mxRectangle width="320" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -328,7 +315,7 @@
             <mxRectangle width="30" height="30" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="dOVWwTzUJoapFZF-kY8Z-228" value="modified_task INT NOT NULL" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-226" vertex="1">
+        <mxCell id="dOVWwTzUJoapFZF-kY8Z-228" value="modified_task_id INT NOT NULL" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" parent="dOVWwTzUJoapFZF-kY8Z-226" vertex="1">
           <mxGeometry x="30" width="320" height="30" as="geometry">
             <mxRectangle width="320" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -363,6 +350,33 @@
           <mxGeometry width="100" height="100" relative="1" as="geometry">
             <mxPoint x="890" y="250" as="sourcePoint" />
             <mxPoint x="990" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GuIHcJqRSVCnHk-W6yKp-1" value="What will happen with history when we delete task?&lt;br&gt;History will be cleared." style="shape=note;size=20;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1155" y="300" width="100" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="GuIHcJqRSVCnHk-W6yKp-2" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="dOVWwTzUJoapFZF-kY8Z-232" target="GuIHcJqRSVCnHk-W6yKp-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1050" y="340" as="sourcePoint" />
+            <mxPoint x="1200" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GuIHcJqRSVCnHk-W6yKp-3" value="When we delete project all tasks inside that project will be deleted" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+          <mxGeometry x="695" y="400" width="80" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="GuIHcJqRSVCnHk-W6yKp-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.482;exitY=1.045;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.433;entryY=0.004;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="dOVWwTzUJoapFZF-kY8Z-137" target="GuIHcJqRSVCnHk-W6yKp-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="650" y="420" as="sourcePoint" />
+            <mxPoint x="700" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GuIHcJqRSVCnHk-W6yKp-5" value="If we delete user, project will remain" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+          <mxGeometry x="270" y="470" width="80" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="GuIHcJqRSVCnHk-W6yKp-6" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.409;entryY=-0.012;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.464;exitY=1.038;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="dOVWwTzUJoapFZF-kY8Z-49" target="GuIHcJqRSVCnHk-W6yKp-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="260" y="430" as="sourcePoint" />
+            <mxPoint x="310" y="380" as="targetPoint" />
           </mxGeometry>
         </mxCell>
       </root>
